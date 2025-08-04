@@ -161,13 +161,15 @@
       }
     }
 
-    async function revokeCode(code) {
+    async function toggleCodeStatus(code, currentStatus) {
+      const newStatus = !currentStatus;
       try {
-        await updateDoc(doc(db, "codes", code), { revoked: true });
-        showMessage(`🚫 Code "${code}" revoked`, "#ffa500");
+        await updateDoc(doc(db, "codes", code), { revoked: newStatus });
+        const label = newStatus ? "disabled" : "enabled";
+        showMessage(`🔁 Code "${code}" ${label}`, "#ffa500");
       } catch (e) {
         console.error(e);
-        showMessage("❌ Failed to revoke code", "#ff4444");
+        showMessage("❌ Failed to update code status", "#ff4444");
       }
     }
 
@@ -206,7 +208,9 @@
         const data = doc.data();
         const code = doc.id;
         const created = data.createdAt?.toDate().toLocaleString() ?? "Pending...";
-        const status = data.revoked ? "✅ Revoked" : "⏳ Active";
+        const isRevoked = !!data.revoked;
+        const status = isRevoked ? "❌ Disabled" : "✅ Enabled";
+        const toggleLabel = isRevoked ? "Enable" : "Disable";
 
         const codeItem = document.createElement("div");
         codeItem.className = "code-item";
@@ -218,16 +222,16 @@
           </div>
           <div class="code-actions">
             <button onclick="deleteCode('${code}')">Delete</button>
-            <button onclick="revokeCode('${code}')">Revoke</button>
+            <button onclick="toggleCodeStatus('${code}', ${isRevoked})">${toggleLabel}</button>
           </div>
         `;
         codeList.appendChild(codeItem);
       });
     });
 
-    // 🔓 Global access for button handlers
+    // Global access for buttons
     window.deleteCode = deleteCode;
-    window.revokeCode = revokeCode;
+    window.toggleCodeStatus = toggleCodeStatus;
   </script>
 </body>
 </html>
