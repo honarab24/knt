@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KONEK TV LOGIN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #loginSection, #contentSection {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 18px;
+      width: 250px;
+      text-align: center;
+    }
+    button:focus, input:focus {
+      outline: 2px solid #0f0;
+    }
+    .expired {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginSection">
+    <h2>Enter Login Code</h2>
+    <input id="codeInput" type="text" placeholder="Enter Code" autofocus />
+    <button id="loginBtn">Login</button>
+    <p id="statusMsg"></p>
+  </div>
+
+  <div id="contentSection">
+    <h2>Welcome to KONEK TV</h2>
+    <p>Access expires in: <span id="countdown"></span></p>
+    <button id="logoutBtn">Logout</button>
+    <!-- Place your unlocked IPTV UI here -->
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // ✅ Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
+      authDomain: "konektv-login.firebaseapp.com",
+      projectId: "konektv-login",
+      storageBucket: "konektv-login.firebasestorage.app",
+      messagingSenderId: "289819667898",
+      appId: "1:289819667898:web:4b95994fc6a27c84f78183"
+    };
+
+    // 🔥 Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const codeInput = document.getElementById('codeInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginSection = document.getElementById('loginSection');
+    const contentSection = document.getElementById('contentSection');
+    const statusMsg = document.getElementById('statusMsg');
+    const countdown = document.getElementById('countdown');
+
+    let interval;
+
+    // 🔄 Auto-check local storage
+    const savedCode = localStorage.getItem('loginCode');
+    const savedExpire = localStorage.getItem('expiresAt');
+    if (savedCode && savedExpire && new Date(savedExpire) > new Date()) {
+      showContent(savedExpire);
+    } else {
+      showLogin();
+    }
+
+    // 🔐 Login button action
+    loginBtn.addEventListener('click', async () => {
+      const code = codeInput.value.trim();
+      if (!code) return;
+
+      statusMsg.textContent = "Checking...";
+      try {
+        const codeRef = doc(db, "loginCodes", code);
+        const codeSnap = await getDoc(codeRef);
+
+        if (!codeSnap.exists()) {
+          statusMsg.textContent = "❌ Invalid code.";
+          return;
+        }
+
+        const data = codeSnap.data();
+        const expiresAt = new Date(data.expiresAt);
+
+        if (expiresAt <= new Date()) {
+          statusMsg.textContent = "⚠️ Code expired.";
+          return;
+        }
+
+        // ✅ Valid code
+        localStorage.setItem("loginCode", code);
+        localStorage.setItem("expiresAt", expiresAt.toISOString());
+        showContent(expiresAt.toISOString());
+
+      } catch (err) {
+        statusMsg.textContent = "⚠️ Error: " + err.message;
+      }
+    });
+
+    // 🔓 Logout
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem("loginCode");
+      localStorage.removeItem("expiresAt");
+      clearInterval(interval);
+      showLogin();
+    });
+
+    // 👁️‍🗨️ UI Handlers
+    function showLogin() {
+      loginSection.style.display = "flex";
+      contentSection.style.display = "none";
+      codeInput.focus();
+    }
+
+    function showContent(expiresAt) {
+      loginSection.style.display = "none";
+      contentSection.style.display = "flex";
+      updateCountdown(expiresAt);
+      interval = setInterval(() => updateCountdown(expiresAt), 1000);
+    }
+
+    function updateCountdown(expiresAt) {
+      const now = new Date();
+      const end = new Date(expiresAt);
+      const diff = end - now;
+
+      if (diff <= 0) {
+        countdown.textContent = "Expired";
+        logoutBtn.click(); // auto logout
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+      countdown.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`;
+    }
+  </script>
+</body>
+</html>
