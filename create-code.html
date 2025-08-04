@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Create Login Code</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #00ffd5;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      width: 240px;
+      text-align: center;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #00ffd5;
+      color: black;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Create Login Code</h2>
+  <input type="text" id="code" placeholder="Enter login code" maxlength="30" />
+  <select id="duration">
+    <option value="30">30 Days</option>
+    <option value="15">15 Days</option>
+    <option value="7">7 Days</option>
+  </select>
+  <br />
+  <button onclick="createCode()">Add Code</button>
+  <div id="message"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
+      authDomain: "konektv-login.firebaseapp.com",
+      projectId: "konektv-login",
+      storageBucket: "konektv-login.firebasestorage.app",
+      messagingSenderId: "289819667898",
+      appId: "1:289819667898:web:4b95994fc6a27c84f78183"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function createCode() {
+      const code = document.getElementById("code").value.trim();
+      const duration = parseInt(document.getElementById("duration").value);
+      const messageEl = document.getElementById("message");
+
+      if (!code || code.length < 4) {
+        messageEl.innerText = "⚠️ Please enter a valid code (min 4 characters)";
+        messageEl.style.color = "#ff6666";
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "codes", code), {
+          duration: duration,
+          createdAt: new Date().toISOString(),
+        });
+
+        messageEl.innerText = `✅ Code "${code}" added for ${duration} days!`;
+        messageEl.style.color = "#00ff99";
+        document.getElementById("code").value = "";
+      } catch (error) {
+        console.error("Error creating code:", error);
+        messageEl.innerText = "❌ Failed to create code. Check console.";
+        messageEl.style.color = "#ff4444";
+      }
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") createCode();
+    });
+  </script>
+</body>
+</html>
