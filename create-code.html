@@ -3,17 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Create Login Code</title>
+  <title>Create & Manage Login Codes</title>
   <style>
     body {
       background: #121212;
       color: white;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
       padding: 20px;
       text-align: center;
     }
@@ -21,52 +16,73 @@
     h2 {
       color: #00ffd5;
       margin-bottom: 20px;
-      font-size: 24px;
+      font-size: 26px;
     }
 
     input, select {
       padding: 12px;
-      font-size: 18px;
+      font-size: 16px;
       border-radius: 8px;
       border: none;
-      margin-bottom: 15px;
-      width: 260px;
-      text-align: center;
+      margin: 5px;
+      width: 220px;
       background: #1f1f1f;
       color: white;
       outline: none;
     }
 
-    input:focus, select:focus {
-      border: 2px solid #00ffd5;
-    }
-
     button {
-      padding: 12px 24px;
+      padding: 10px 16px;
+      margin: 5px;
       background: #00ffd5;
       color: black;
-      font-size: 18px;
+      font-size: 16px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s ease;
     }
 
-    button:hover, button:focus {
+    button:hover {
       background: #00c0a8;
-      outline: none;
     }
 
     #message {
-      margin-top: 20px;
+      margin: 15px 0;
       font-weight: bold;
-      font-size: 16px;
+    }
+
+    .code-list {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .code-item {
+      background: #1e1e1e;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .code-info {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .code-actions button {
+      margin-left: 5px;
     }
   </style>
 </head>
 <body>
-  <h2>Create Login Code</h2>
-  <input type="text" id="code" placeholder="Enter login code" maxlength="30" autofocus />
+  <h2>Manage Login Codes</h2>
+  <input type="text" id="code" placeholder="Enter new code" maxlength="30" />
   <select id="duration">
     <option value="30">30 Days</option>
     <option value="15">15 Days</option>
@@ -75,12 +91,14 @@
   <button id="createBtn">Add Code</button>
   <div id="message"></div>
 
-  <script type="module">
-    // ✅ Firebase SDK v12 imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  <div class="code-list" id="codeList"></div>
 
-    // ✅ Your Firebase config
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp, updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
       authDomain: "konektv-login.firebaseapp.com",
@@ -90,16 +108,19 @@
       appId: "1:289819667898:web:4b95994fc6a27c84f78183"
     };
 
-    // ✅ Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     const codeInput = document.getElementById("code");
     const durationSelect = document.getElementById("duration");
     const messageEl = document.getElementById("message");
-    const createBtn = document.getElementById("createBtn");
+    const codeList = document.getElementById("codeList");
 
-    // ✅ Create code and write to Firestore
+    const showMessage = (msg, color = "#00ff99") => {
+      messageEl.textContent = msg;
+      messageEl.style.color = color;
+    };
+
     async function createCode() {
       const code = codeInput.value.trim();
       const duration = parseInt(durationSelect.value);
@@ -111,29 +132,72 @@
 
       try {
         await setDoc(doc(db, "codes", code), {
-          duration: duration,
-          createdAt: serverTimestamp()
+          duration,
+          createdAt: serverTimestamp(),
+          revoked: false
         });
-
-        showMessage(`✅ Code "${code}" added for ${duration} days!`, "#00ff99");
+        showMessage(`✅ Code "${code}" created for ${duration} days`);
         codeInput.value = "";
-        codeInput.focus();
-      } catch (error) {
-        console.error("Error creating code:", error);
-        showMessage("❌ Failed to create code. See console.", "#ff4444");
+      } catch (e) {
+        console.error(e);
+        showMessage("❌ Failed to create code", "#ff4444");
       }
     }
 
-    function showMessage(msg, color) {
-      messageEl.textContent = msg;
-      messageEl.style.color = color;
+    async function deleteCode(code) {
+      try {
+        await deleteDoc(doc(db, "codes", code));
+        showMessage(`🗑️ Code "${code}" deleted`, "#ffcc00");
+      } catch (e) {
+        console.error(e);
+        showMessage("❌ Failed to delete code", "#ff4444");
+      }
     }
 
-    // ✅ Button + Enter key support
-    createBtn.addEventListener("click", createCode);
+    async function revokeCode(code) {
+      try {
+        await updateDoc(doc(db, "codes", code), { revoked: true });
+        showMessage(`🚫 Code "${code}" revoked`, "#ffa500");
+      } catch (e) {
+        console.error(e);
+        showMessage("❌ Failed to revoke code", "#ff4444");
+      }
+    }
+
+    document.getElementById("createBtn").addEventListener("click", createCode);
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") createCode();
     });
+
+    // 🔄 Listen to real-time updates
+    onSnapshot(collection(db, "codes"), (snapshot) => {
+      codeList.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const code = doc.id;
+        const created = data.createdAt?.toDate().toLocaleString() ?? "Pending...";
+        const revoked = data.revoked ? "✅ Revoked" : "⏳ Active";
+
+        const codeItem = document.createElement("div");
+        codeItem.className = "code-item";
+        codeItem.innerHTML = `
+          <div class="code-info">
+            <div><strong>${code}</strong> (${data.duration}d)</div>
+            <div>Created: ${created}</div>
+            <div>Status: ${revoked}</div>
+          </div>
+          <div class="code-actions">
+            <button onclick="deleteCode('${code}')">Delete</button>
+            <button onclick="revokeCode('${code}')">Revoke</button>
+          </div>
+        `;
+        codeList.appendChild(codeItem);
+      });
+    });
+
+    // Make functions global for onclick handlers
+    window.deleteCode = deleteCode;
+    window.revokeCode = revokeCode;
   </script>
 </body>
 </html>
