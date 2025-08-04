@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>KONEK TV - Code Manager</title>
+  <title>Create & Manage Login Codes</title>
   <style>
     body {
       background: #121212;
@@ -84,10 +84,9 @@
   <h2>KONEK TV PANEL</h2>
   <input type="text" id="code" placeholder="Enter new code" maxlength="30" />
   <select id="duration">
-    <option value="1m">1 Minute (Test)</option>
-    <option value="7d">7 Days</option>
-    <option value="15d">15 Days</option>
-    <option value="30d">30 Days</option>
+    <option value="30">30 Days</option>
+    <option value="15">15 Days</option>
+    <option value="7">7 Days</option>
   </select>
   <button id="createBtn">Add Code</button>
   <div id="message"></div>
@@ -102,16 +101,16 @@
       doc,
       setDoc,
       deleteDoc,
+      updateDoc,
       onSnapshot,
-      serverTimestamp,
-      updateDoc
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
       authDomain: "konektv-login.firebaseapp.com",
       projectId: "konektv-login",
-      storageBucket: "konektv-login.appspot.com",
+      storageBucket: "konektv-login.firebasestorage.app",
       messagingSenderId: "289819667898",
       appId: "1:289819667898:web:4b95994fc6a27c84f78183"
     };
@@ -129,19 +128,9 @@
       messageEl.style.color = color;
     };
 
-    const parseDuration = (value) => {
-      if (value.endsWith("m")) {
-        return { type: "minutes", value: parseInt(value) };
-      } else if (value.endsWith("d")) {
-        return { type: "days", value: parseInt(value) };
-      }
-      return { type: "days", value: 30 };
-    };
-
     async function createCode() {
       const code = codeInput.value.trim();
-      const rawDuration = durationSelect.value;
-      const { type, value } = parseDuration(rawDuration);
+      const duration = parseInt(durationSelect.value);
 
       if (code.length < 4) {
         showMessage("⚠️ Code must be at least 4 characters", "#ff6666");
@@ -150,11 +139,11 @@
 
       try {
         await setDoc(doc(db, "codes", code), {
-          duration: rawDuration,
+          duration,
           createdAt: serverTimestamp(),
           revoked: false
         });
-        showMessage(`✅ Code "${code}" created for ${value} ${type}`);
+        showMessage(`✅ Code "${code}" created for ${duration} days`);
         codeInput.value = "";
       } catch (e) {
         console.error(e);
@@ -172,26 +161,24 @@
       }
     }
 
-    async function toggleCodeStatus(code, isRevoked) {
+    async function toggleCodeStatus(code, currentStatus) {
+      const newStatus = !currentStatus;
       try {
-        await updateDoc(doc(db, "codes", code), { revoked: !isRevoked });
-        showMessage(`🔁 Code "${code}" ${!isRevoked ? "disabled" : "enabled"}`, "#ffa500");
+        await updateDoc(doc(db, "codes", code), {
+          revoked: newStatus
+        });
+        const statusText = newStatus ? "disabled" : "enabled";
+        showMessage(`🔁 Code "${code}" ${statusText}`, "#ffa500");
       } catch (e) {
         console.error(e);
-        showMessage("❌ Failed to toggle code status", "#ff4444");
+        showMessage("❌ Failed to update code status", "#ff4444");
       }
     }
 
-    const getExpirationTime = (createdAt, durationRaw) => {
-      const { type, value } = parseDuration(durationRaw);
-      const exp = new Date(createdAt);
-      if (type === "minutes") {
-        exp.setMinutes(exp.getMinutes() + value);
-      } else {
-        exp.setDate(exp.getDate() + value);
-      }
-      return exp;
-    };
+    document.getElementById("createBtn").addEventListener("click", createCode);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") createCode();
+    });
 
     function checkAndDeleteExpiredCodes(snapshot) {
       const now = new Date();
@@ -202,9 +189,11 @@
         if (!data.createdAt || data.revoked) return;
 
         const createdAt = data.createdAt.toDate();
-        const expiresAt = getExpirationTime(createdAt, data.duration);
+        const expiresAt = new Date(createdAt);
+        expiresAt.setDate(expiresAt.getDate() + data.duration);
+
         if (now > expiresAt) {
-          console.log(`🧹 Deleting expired code: ${code}`);
+          console.log(`⏳ Auto-deleting expired code: ${code}`);
           await deleteDoc(doc(db, "codes", code));
         }
       });
@@ -226,7 +215,7 @@
         codeItem.className = "code-item";
         codeItem.innerHTML = `
           <div class="code-info">
-            <div><strong>${code}</strong> (${data.duration})</div>
+            <div><strong>${code}</strong> (${data.duration}d)</div>
             <div>Created: ${created}</div>
             <div>Status: ${status}</div>
           </div>
