@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>KONEK TV HOME</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    #loginBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #00ffd5;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #loginBtn:focus {
+      outline: none;
+      box-shadow: 0 0 10px #00ffd5;
+      transform: scale(1.05);
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ffd5;
+      padding: 20px 0 10px;
+      font-size: 24px;
+    }
+
+    #countdown {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 0 20px 40px;
+    }
+
+    .box {
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      border-radius: 15px;
+      text-align: center;
+      padding: 20px;
+      transition: 0.3s ease;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .box.unlocked {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .box:focus {
+      border: 3px solid #00ffd5;
+      transform: scale(1.05);
+    }
+
+    .box:hover {
+      background-color: #00ffd5;
+      color: black;
+    }
+
+    .box img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+    }
+
+    .box span {
+      font-size: 16px;
+      font-weight: bold;
+      display: block;
+    }
+
+    #keyboardModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 9999;
+      display: none;
+      color: #fff;
+    }
+
+    #keyboardInput {
+      width: 100%;
+      font-size: 18px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #111;
+      border: 2px solid #00ffd5;
+      color: white;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .key {
+      padding: 10px;
+      text-align: center;
+      background: #333;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .key:focus {
+      background: #00ffd5;
+      color: #000;
+      outline: none;
+    }
+
+    .key:hover {
+      background: #00ffd5;
+      color: #000;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .box img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .box {
+        padding: 15px;
+      }
+
+      #loginBtn {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="loginBtn" tabindex="1" onclick="showKeyboard()">🔑 Login Code</button>
+  <h1>KONEK TV HOME</h1>
+  <div id="countdown">🔒 Please login to unlock channels.</div>
+
+  <div class="grid">
+    <div class="box" tabindex="1" onclick="openChannel('phchannel')">
+      <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
+      <span>Philippines Channel</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('astro')">
+      <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
+      <span>ASTRO</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('netflix')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
+      <span>Netflix</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('primev')">
+      <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
+      <span>Prime Video</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('phmovies')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
+      <span>PH MOVIES</span>
+    </div>
+  </div>
+
+  <!-- On-screen keyboard modal -->
+  <div id="keyboardModal">
+    <input type="text" id="keyboardInput" readonly />
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+
+  <script>
+    const countdownEl = document.getElementById("countdown");
+    const keyboardModal = document.getElementById("keyboardModal");
+    const keyboardInput = document.getElementById("keyboardInput");
+    const keys = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", "←", "⏎"];
+
+    function openChannel(id) {
+      window.location.href = "go:" + id;
+    }
+
+    function showKeyboard() {
+      keyboardInput.value = "";
+      keyboardModal.style.display = "block";
+      buildKeyboard();
+    }
+
+    function buildKeyboard() {
+      const container = document.getElementById("keyboard");
+      container.innerHTML = "";
+      keys.forEach((k) => {
+        const key = document.createElement("div");
+        key.textContent = k;
+        key.className = "key";
+        key.tabIndex = 1;
+        key.onclick = () => handleKeyPress(k);
+        container.appendChild(key);
+      });
+      setTimeout(() => container.querySelector(".key")?.focus(), 50);
+    }
+
+    function handleKeyPress(key) {
+      if (key === "←") {
+        keyboardInput.value = keyboardInput.value.slice(0, -1);
+      } else if (key === "⏎") {
+        submitLoginCode(keyboardInput.value.trim());
+      } else {
+        keyboardInput.value += key;
+      }
+    }
+
+    function submitLoginCode(code) {
+      const codes = {
+        "SIREDMON7": 7,
+        "SIREDMON15": 15,
+        "SIREDMON30": 30
+      };
+
+      const upperCode = code.toUpperCase();
+      if (!codes[upperCode]) {
+        alert("❌ Invalid code.");
+        return;
+      }
+
+      const expire = Date.now() + codes[upperCode] * 24 * 60 * 60 * 1000;
+      localStorage.setItem("login_expire", expire);
+      keyboardModal.style.display = "none";
+      updateAccessState();
+    }
+
+    function lockChannels() {
+      document.querySelectorAll('.box').forEach(b => b.classList.remove("unlocked"));
+    }
+
+    function unlockChannels() {
+      document.querySelectorAll('.box').forEach(b => b.classList.add("unlocked"));
+    }
+
+    function updateAccessState() {
+      const expireAt = parseInt(localStorage.getItem("login_expire"));
+      const loginBtn = document.getElementById("loginBtn");
+
+      if (!expireAt || isNaN(expireAt)) {
+        lockChannels();
+        countdownEl.textContent = "🔒 Please login to unlock.";
+        loginBtn.style.display = "inline-block";
+        return;
+      }
+
+      const now = Date.now();
+      const remaining = expireAt - now;
+
+      if (remaining <= 0) {
+        localStorage.removeItem("login_expire");
+        lockChannels();
+        countdownEl.textContent = "🔒 Access expired. Please login again.";
+        loginBtn.style.display = "inline-block";
+        return;
+      }
+
+      unlockChannels();
+      loginBtn.style.display = "none";
+
+      const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((remaining / (1000 * 60)) % 60);
+      const secs = Math.floor((remaining / 1000) % 60);
+
+      countdownEl.textContent = `🔓 Access expires in: ${days}d ${hours}h ${mins}m ${secs}s`;
+      setTimeout(updateAccessState, 1000);
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (keyboardModal.style.display === "block") return;
+
+      const focusable = Array.from(document.querySelectorAll('.box.unlocked'));
+      const currentIndex = focusable.indexOf(document.activeElement);
+      const cols = Math.floor(window.innerWidth / 180);
+
+      if (e.key === 'ArrowRight') {
+        focusable[currentIndex + 1]?.focus();
+      } else if (e.key === 'ArrowLeft') {
+        focusable[currentIndex - 1]?.focus();
+      } else if (e.key === 'ArrowDown') {
+        focusable[currentIndex + cols]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        focusable[currentIndex - cols]?.focus();
+      } else if (e.key === 'Enter') {
+        document.activeElement?.click();
+      }
+    });
+
+    window.onload = () => {
+      updateAccessState();
+      const loginBtn = document.getElementById("loginBtn");
+      const expireAt = parseInt(localStorage.getItem("login_expire"));
+
+      if (!expireAt || Date.now() > expireAt) {
+        loginBtn.focus();
+      } else {
+        const firstUnlocked = document.querySelector('.box.unlocked');
+        if (firstUnlocked) firstUnlocked.focus();
+      }
+    };
+  </script>
+</body>
+</html>
