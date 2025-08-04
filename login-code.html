@@ -13,7 +13,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       padding: 20px;
       text-align: center;
     }
@@ -21,6 +21,7 @@
     h2 {
       color: #00ffd5;
       margin-bottom: 20px;
+      font-size: 24px;
     }
 
     input {
@@ -30,8 +31,14 @@
       border: none;
       outline: none;
       margin-bottom: 15px;
-      width: 200px;
+      width: 260px;
       text-align: center;
+      background: #1f1f1f;
+      color: white;
+    }
+
+    input:focus {
+      border: 2px solid #00ffd5;
     }
 
     button {
@@ -42,26 +49,34 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover, button:focus {
+      background: #00c0a8;
+      outline: none;
     }
 
     #message {
       margin-top: 20px;
-      color: #ff6666;
       font-weight: bold;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <h2>Enter Login Code</h2>
-  <input type="text" id="codeInput" maxlength="20" placeholder="Enter code" />
+  <input type="text" id="codeInput" maxlength="20" placeholder="Enter code" autofocus />
   <br />
-  <button onclick="validateCode()">Submit</button>
+  <button id="submitBtn">Submit</button>
   <div id="message"></div>
 
   <script type="module">
+    // ✅ Firebase SDK v12 (Modular)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+    // ✅ Your Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
       authDomain: "konektv-login.firebaseapp.com",
@@ -74,45 +89,65 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function validateCode() {
-      const code = document.getElementById("codeInput").value.trim();
-      const messageEl = document.getElementById("message");
+    const input = document.getElementById("codeInput");
+    const messageEl = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
 
-      if (!code) {
-        messageEl.innerText = "Please enter a code.";
+    async function validateCode() {
+      const code = input.value.trim();
+
+      if (!code || code.length < 4) {
+        showMessage("⚠️ Enter a valid code (min 4 characters)", "#ff6666");
         return;
       }
 
       try {
-        const codeRef = doc(db, "codes", code);
-        const codeSnap = await getDoc(codeRef);
+        const ref = doc(db, "codes", code);
+        const snap = await getDoc(ref);
 
-        if (!codeSnap.exists()) {
-          messageEl.innerText = "Invalid code.";
+        if (!snap.exists()) {
+          showMessage("❌ Invalid code.", "#ff6666");
           return;
         }
 
-        const data = codeSnap.data();
-        const duration = data.duration || 0;
+        const data = snap.data();
+        const duration = data.duration;
+        const createdAt = data.createdAt?.toDate?.() || new Date();
 
-        if (duration !== 7 && duration !== 15 && duration !== 30) {
-          messageEl.innerText = "Code has invalid duration.";
+        if (![7, 15, 30].includes(duration)) {
+          showMessage("⚠️ Code has an invalid duration.", "#ffcc00");
           return;
         }
 
-        // Save expiration in localStorage
-        const expireAt = Date.now() + duration * 24 * 60 * 60 * 1000;
-        localStorage.setItem("expireAt", expireAt);
+        // Calculate expiration
+        const expireAt = new Date(createdAt.getTime() + duration * 24 * 60 * 60 * 1000);
+        const now = new Date();
 
-        // Redirect
+        if (now > expireAt) {
+          showMessage("⏰ Code has expired.", "#ff6666");
+          return;
+        }
+
+        // Save expiration and code in localStorage
+        localStorage.setItem("expireAt", expireAt.getTime());
+        localStorage.setItem("loginCode", code);
+
+        // Redirect to main page
         window.location.href = "index.html";
-      } catch (error) {
-        console.error("Error validating code:", error);
-        messageEl.innerText = "An error occurred. Try again.";
+      } catch (err) {
+        console.error(err);
+        showMessage("❌ Error validating code.", "#ff4444");
       }
     }
 
-    document.addEventListener("keydown", function (e) {
+    function showMessage(text, color) {
+      messageEl.textContent = text;
+      messageEl.style.color = color;
+    }
+
+    // Support Enter key
+    submitBtn.addEventListener("click", validateCode);
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") validateCode();
     });
   </script>
