@@ -11,6 +11,7 @@
       background-color: #121212;
       color: white;
       overflow-x: hidden;
+      position: relative;
     }
 
     h1 {
@@ -66,6 +67,31 @@
       display: block;
     }
 
+    /* LOGIN BUTTON TOP-RIGHT */
+    .login-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      border-radius: 12px;
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      border: 2px solid transparent;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .login-button:hover,
+    .login-button:focus {
+      border: 2px solid #00ffd5;
+      background-color: #00ffd5;
+      color: black;
+    }
+
     @media (max-width: 600px) {
       .grid {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -80,37 +106,42 @@
       .box {
         padding: 15px;
       }
+
+      .login-button {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
     }
   </style>
 </head>
 <body>
   <h1>KONEK TV HOME</h1>
+
+  <!-- LOGIN BUTTON TOP-RIGHT -->
+  <button class="login-button" tabindex="1" onclick="window.location.href='login-code.html'">
+    🔐 Login Code
+  </button>
+
   <div id="countdown">📺 Choose a channel to watch.</div>
 
   <div class="grid">
-    <!-- 🔐 LOGIN CODE BUTTON -->
-    <div class="box" tabindex="1" onclick="openChannel('login-code')">
-      <img src="https://img.icons8.com/fluency/96/lock-2.png" alt="Login" />
-      <span>Login Code</span>
-    </div>
-
-    <div class="box" tabindex="1" onclick="openChannel('phchannel')">
+    <div class="box" tabindex="2" onclick="openChannel('phchannel')">
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel</span>
     </div>
-    <div class="box" tabindex="1" onclick="openChannel('astro')">
+    <div class="box" tabindex="3" onclick="openChannel('astro')">
       <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
       <span>ASTRO</span>
     </div>
-    <div class="box" tabindex="1" onclick="openChannel('netflix')">
+    <div class="box" tabindex="4" onclick="openChannel('netflix')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
       <span>Netflix</span>
     </div>
-    <div class="box" tabindex="1" onclick="openChannel('primev')">
+    <div class="box" tabindex="5" onclick="openChannel('primev')">
       <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
       <span>Prime Video</span>
     </div>
-    <div class="box" tabindex="1" onclick="openChannel('phmovies')">
+    <div class="box" tabindex="6" onclick="openChannel('phmovies')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
       <span>PH MOVIES</span>
     </div>
@@ -118,15 +149,11 @@
 
   <script>
     function openChannel(id) {
-      if (id === 'login-code') {
-        window.location.href = 'login-code.html';
-      } else {
-        window.location.href = 'go:' + id;
-      }
+      window.location.href = "go:" + id;
     }
 
     document.addEventListener('keydown', function (e) {
-      const focusable = Array.from(document.querySelectorAll('.box'));
+      const focusable = Array.from(document.querySelectorAll('button.login-button, .box'));
       const currentIndex = focusable.indexOf(document.activeElement);
       const cols = Math.floor(window.innerWidth / 180);
 
@@ -135,16 +162,22 @@
       } else if (e.key === 'ArrowLeft') {
         focusable[currentIndex - 1]?.focus();
       } else if (e.key === 'ArrowDown') {
-        focusable[currentIndex + cols]?.focus();
+        if (currentIndex === 0) {
+          focusable[1]?.focus(); // skip to first box
+        } else {
+          focusable[currentIndex + cols]?.focus();
+        }
       } else if (e.key === 'ArrowUp') {
-        focusable[currentIndex - cols]?.focus();
+        if (currentIndex > 0) {
+          focusable[currentIndex - cols]?.focus();
+        }
       } else if (e.key === 'Enter') {
         document.activeElement?.click();
       }
     });
 
     window.onload = () => {
-      const first = document.querySelector('.box');
+      const first = document.querySelector('.login-button');
       if (first) first.focus();
     };
   </script>
