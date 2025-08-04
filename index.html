@@ -43,6 +43,7 @@
       transition: 0.3s ease;
       outline: none;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      display: none; /* default locked */
     }
 
     .box:focus {
@@ -67,7 +68,6 @@
       display: block;
     }
 
-    /* LOGIN BUTTON TOP-RIGHT */
     .login-button {
       position: absolute;
       top: 10px;
@@ -117,14 +117,13 @@
 <body>
   <h1>KONEK TV HOME</h1>
 
-  <!-- LOGIN BUTTON TOP-RIGHT -->
-  <button class="login-button" tabindex="1" onclick="window.location.href='login-code.html'">
+  <button class="login-button" tabindex="1" id="loginBtn" onclick="window.location.href='login-code.html'">
     🔐 Login Code
   </button>
 
-  <div id="countdown">📺 Choose a channel to watch.</div>
+  <div id="countdown">🔒 Please login to unlock channels.</div>
 
-  <div class="grid">
+  <div class="grid" id="channelGrid">
     <div class="box" tabindex="2" onclick="openChannel('phchannel')">
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel</span>
@@ -152,8 +151,51 @@
       window.location.href = "go:" + id;
     }
 
+    function checkLogin() {
+      const expireAt = localStorage.getItem('expireAt');
+      const now = Date.now();
+
+      if (expireAt && now < parseInt(expireAt)) {
+        document.querySelectorAll('.box').forEach(box => {
+          box.style.display = 'block';
+        });
+        document.getElementById("loginBtn").style.display = "none";
+        updateCountdown(parseInt(expireAt));
+      } else {
+        document.querySelectorAll('.box').forEach(box => {
+          box.style.display = 'none';
+        });
+        document.getElementById("loginBtn").style.display = "inline-block";
+        document.getElementById("countdown").innerText = "🔒 Please login to unlock channels.";
+      }
+    }
+
+    function updateCountdown(expireAt) {
+      const countdownEl = document.getElementById("countdown");
+      const interval = setInterval(() => {
+        const now = Date.now();
+        const diff = expireAt - now;
+
+        if (diff <= 0) {
+          clearInterval(interval);
+          localStorage.removeItem("expireAt");
+          location.reload();
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        countdownEl.innerText = `🔓 Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }, 1000);
+    }
+
     document.addEventListener('keydown', function (e) {
-      const focusable = Array.from(document.querySelectorAll('button.login-button, .box'));
+      const focusable = Array.from(document.querySelectorAll('.login-button, .box'))
+        .filter(el => el.style.display !== 'none');
+
       const currentIndex = focusable.indexOf(document.activeElement);
       const cols = Math.floor(window.innerWidth / 180);
 
@@ -162,22 +204,17 @@
       } else if (e.key === 'ArrowLeft') {
         focusable[currentIndex - 1]?.focus();
       } else if (e.key === 'ArrowDown') {
-        if (currentIndex === 0) {
-          focusable[1]?.focus(); // skip to first box
-        } else {
-          focusable[currentIndex + cols]?.focus();
-        }
+        if (currentIndex >= 0) focusable[currentIndex + cols]?.focus();
       } else if (e.key === 'ArrowUp') {
-        if (currentIndex > 0) {
-          focusable[currentIndex - cols]?.focus();
-        }
+        if (currentIndex >= 0) focusable[currentIndex - cols]?.focus();
       } else if (e.key === 'Enter') {
         document.activeElement?.click();
       }
     });
 
     window.onload = () => {
-      const first = document.querySelector('.login-button');
+      checkLogin();
+      const first = document.querySelector('.login-button, .box');
       if (first) first.focus();
     };
   </script>
