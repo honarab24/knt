@@ -15,11 +15,13 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
+      text-align: center;
     }
 
     h2 {
       color: #00ffd5;
       margin-bottom: 20px;
+      font-size: 24px;
     }
 
     input, select {
@@ -28,42 +30,57 @@
       border-radius: 8px;
       border: none;
       margin-bottom: 15px;
-      width: 240px;
+      width: 260px;
       text-align: center;
+      background: #1f1f1f;
+      color: white;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border: 2px solid #00ffd5;
     }
 
     button {
       padding: 12px 24px;
       background: #00ffd5;
       color: black;
-      font-size: 16px;
+      font-size: 18px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover, button:focus {
+      background: #00c0a8;
+      outline: none;
     }
 
     #message {
       margin-top: 20px;
       font-weight: bold;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <h2>Create Login Code</h2>
-  <input type="text" id="code" placeholder="Enter login code" maxlength="30" />
+  <input type="text" id="code" placeholder="Enter login code" maxlength="30" autofocus />
   <select id="duration">
     <option value="30">30 Days</option>
     <option value="15">15 Days</option>
     <option value="7">7 Days</option>
   </select>
-  <br />
-  <button onclick="createCode()">Add Code</button>
+  <button id="createBtn">Add Code</button>
   <div id="message"></div>
 
   <script type="module">
+    // ✅ Firebase SDK v12 imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+    // ✅ Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
       authDomain: "konektv-login.firebaseapp.com",
@@ -73,37 +90,48 @@
       appId: "1:289819667898:web:4b95994fc6a27c84f78183"
     };
 
+    // ✅ Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function createCode() {
-      const code = document.getElementById("code").value.trim();
-      const duration = parseInt(document.getElementById("duration").value);
-      const messageEl = document.getElementById("message");
+    const codeInput = document.getElementById("code");
+    const durationSelect = document.getElementById("duration");
+    const messageEl = document.getElementById("message");
+    const createBtn = document.getElementById("createBtn");
 
-      if (!code || code.length < 4) {
-        messageEl.innerText = "⚠️ Please enter a valid code (min 4 characters)";
-        messageEl.style.color = "#ff6666";
+    // ✅ Create code and write to Firestore
+    async function createCode() {
+      const code = codeInput.value.trim();
+      const duration = parseInt(durationSelect.value);
+
+      if (code.length < 4) {
+        showMessage("⚠️ Code must be at least 4 characters", "#ff6666");
         return;
       }
 
       try {
         await setDoc(doc(db, "codes", code), {
           duration: duration,
-          createdAt: new Date().toISOString(),
+          createdAt: serverTimestamp()
         });
 
-        messageEl.innerText = `✅ Code "${code}" added for ${duration} days!`;
-        messageEl.style.color = "#00ff99";
-        document.getElementById("code").value = "";
+        showMessage(`✅ Code "${code}" added for ${duration} days!`, "#00ff99");
+        codeInput.value = "";
+        codeInput.focus();
       } catch (error) {
         console.error("Error creating code:", error);
-        messageEl.innerText = "❌ Failed to create code. Check console.";
-        messageEl.style.color = "#ff4444";
+        showMessage("❌ Failed to create code. See console.", "#ff4444");
       }
     }
 
-    document.addEventListener("keydown", function (e) {
+    function showMessage(msg, color) {
+      messageEl.textContent = msg;
+      messageEl.style.color = color;
+    }
+
+    // ✅ Button + Enter key support
+    createBtn.addEventListener("click", createCode);
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") createCode();
     });
   </script>
