@@ -43,7 +43,7 @@
       transition: 0.3s ease;
       outline: none;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      display: none; /* locked by default */
+      cursor: pointer;
     }
 
     .box:focus {
@@ -121,7 +121,7 @@
     🔐 Login Code
   </button>
 
-  <div id="countdown">🔒 Please login to unlock channels.</div>
+  <div id="countdown">🔒 Please login to access channels.</div>
 
   <div class="grid" id="channelGrid">
     <div class="box" tabindex="2" onclick="openChannel('phchannel')">
@@ -147,8 +147,14 @@
   </div>
 
   <script>
+    let isLoggedIn = false;
+
     function openChannel(id) {
-      window.location.href = "go:" + id;
+      if (isLoggedIn) {
+        window.location.href = "go:" + id;
+      } else {
+        alert("🔒 Please login to access this channel.");
+      }
     }
 
     function checkLogin() {
@@ -156,17 +162,13 @@
       const now = Date.now();
 
       if (expireAt && now < parseInt(expireAt)) {
-        document.querySelectorAll('.box').forEach(box => {
-          box.style.display = 'block';
-        });
+        isLoggedIn = true;
         document.getElementById("loginBtn").style.display = "none";
         updateCountdown(parseInt(expireAt));
       } else {
-        document.querySelectorAll('.box').forEach(box => {
-          box.style.display = 'none';
-        });
+        isLoggedIn = false;
         document.getElementById("loginBtn").style.display = "inline-block";
-        document.getElementById("countdown").innerText = "🔒 Please login to unlock channels.";
+        document.getElementById("countdown").innerText = "🔒 Please login to access channels.";
       }
     }
 
@@ -194,7 +196,7 @@
 
     document.addEventListener('keydown', function (e) {
       const focusable = Array.from(document.querySelectorAll('.login-button, .box'))
-        .filter(el => el.style.display !== 'none');
+        .filter(el => getComputedStyle(el).display !== 'none');
 
       const currentIndex = focusable.indexOf(document.activeElement);
       const cols = Math.floor(window.innerWidth / 180);
