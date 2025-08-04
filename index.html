@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,196 +8,105 @@
   <style>
     body {
       margin: 0;
+      background: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: white;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      min-height: 100vh;
     }
-
-    #loginBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #00ffd5;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #loginBtn:focus {
-      outline: none;
-      box-shadow: 0 0 10px #00ffd5;
-      transform: scale(1.05);
-    }
-
     h1 {
-      text-align: center;
+      margin-top: 10px;
       color: #00ffd5;
-      padding: 20px 0 10px;
-      font-size: 24px;
     }
-
-    #countdown {
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: #ccc;
-    }
-
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
-      padding: 0 20px 40px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      padding: 10px;
+      width: 100%;
+      max-width: 1000px;
     }
-
     .box {
-      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
-      border-radius: 15px;
-      text-align: center;
+      background: #111;
       padding: 20px;
-      transition: 0.3s ease;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid #00ffd5;
       outline: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      opacity: 0.3;
+    }
+    .box.locked {
+      opacity: 0.5;
       pointer-events: none;
     }
-
-    .box.unlocked {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
     .box:focus {
-      border: 3px solid #00ffd5;
-      transform: scale(1.05);
+      border-color: yellow;
     }
-
-    .box:hover {
-      background-color: #00ffd5;
-      color: black;
-    }
-
-    .box img {
-      width: 60px;
-      height: 60px;
-      margin-bottom: 10px;
-    }
-
-    .box span {
-      font-size: 16px;
-      font-weight: bold;
-      display: block;
-    }
-
-    #keyboardModal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      padding: 20px;
-      border-radius: 10px;
-      z-index: 9999;
-      display: none;
-      color: #fff;
-    }
-
-    #keyboardInput {
-      width: 100%;
+    #loginBtn {
+      padding: 12px 24px;
       font-size: 18px;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #111;
-      border: 2px solid #00ffd5;
-      color: white;
-    }
-
-    .keyboard {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-    }
-
-    .key {
-      padding: 10px;
-      text-align: center;
-      background: #333;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .key:focus {
+      margin: 10px;
       background: #00ffd5;
       color: #000;
-      outline: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
-
+    #keyboardContainer {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin: 10px;
+    }
+    .key {
+      padding: 12px 16px;
+      background: #222;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #444;
+    }
     .key:hover {
       background: #00ffd5;
       color: #000;
     }
-
-    @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 15px;
-      }
-
-      .box img {
-        width: 50px;
-        height: 50px;
-      }
-
-      .box {
-        padding: 15px;
-      }
-
-      #loginBtn {
-        padding: 8px 16px;
-        font-size: 14px;
-      }
+    #codeInput {
+      font-size: 20px;
+      padding: 10px;
+      margin: 10px;
+      width: 220px;
+      text-align: center;
+      background: #111;
+      border: 2px solid #00ffd5;
+      color: #fff;
+      border-radius: 8px;
+      outline: none;
+    }
+    #countdown {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <button id="loginBtn" tabindex="1" onclick="showKeyboard()">🔑 Login Code</button>
-  <h1>KONEK TV HOME</h1>
-  <div id="countdown">🔒 Please login to unlock channels.</div>
+  <h1>KONEK TV</h1>
+  <button id="loginBtn">Login Code</button>
+  <div id="countdown"></div>
+  <input type="text" id="codeInput" placeholder="Enter code" maxlength="20" />
+  <div id="keyboardContainer"></div>
 
   <div class="grid">
-    <div class="box" tabindex="1" onclick="openChannel('phchannel')">
-      <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
-      <span>Philippines Channel</span>
-    </div>
-    <div class="box" tabindex="1" onclick="openChannel('astro')">
-      <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
-      <span>ASTRO</span>
-    </div>
-    <div class="box" tabindex="1" onclick="openChannel('netflix')">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
-      <span>Netflix</span>
-    </div>
-    <div class="box" tabindex="1" onclick="openChannel('primev')">
-      <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
-      <span>Prime Video</span>
-    </div>
-    <div class="box" tabindex="1" onclick="openChannel('phmovies')">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
-      <span>PH MOVIES</span>
-    </div>
+    <div class="box locked" tabindex="0">Channel 1</div>
+    <div class="box locked" tabindex="0">Channel 2</div>
+    <div class="box locked" tabindex="0">Channel 3</div>
+    <div class="box locked" tabindex="0">Channel 4</div>
   </div>
 
-  <div id="keyboardModal">
-    <input type="text" id="keyboardInput" readonly />
-    <div class="keyboard" id="keyboard"></div>
-  </div>
-
-  <!-- ✅ Firebase logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
@@ -213,145 +123,108 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    const loginBtn = document.getElementById("loginBtn");
+    const keyboardContainer = document.getElementById("keyboardContainer");
+    const codeInput = document.getElementById("codeInput");
     const countdownEl = document.getElementById("countdown");
-    const keyboardModal = document.getElementById("keyboardModal");
-    const keyboardInput = document.getElementById("keyboardInput");
-    const keys = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", "←", "⏎"];
 
-    function openChannel(id) {
-      window.location.href = "go:" + id;
-    }
+    const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("").concat(["DEL", "OK"]);
 
-    function showKeyboard() {
-      keyboardInput.value = "";
-      keyboardModal.style.display = "block";
-      buildKeyboard();
-    }
+    keys.forEach(key => {
+      const btn = document.createElement("button");
+      btn.className = "key";
+      btn.textContent = key;
+      btn.onclick = () => handleKeyPress(key);
+      keyboardContainer.appendChild(btn);
+    });
 
-    function buildKeyboard() {
-      const container = document.getElementById("keyboard");
-      container.innerHTML = "";
-      keys.forEach((k) => {
-        const key = document.createElement("div");
-        key.textContent = k;
-        key.className = "key";
-        key.tabIndex = 1;
-        key.onclick = () => handleKeyPress(k);
-        container.appendChild(key);
-      });
-      setTimeout(() => container.querySelector(".key")?.focus(), 50);
-    }
+    loginBtn.addEventListener("click", () => {
+      keyboardContainer.style.display = "flex";
+      codeInput.style.display = "block";
+      codeInput.focus();
+    });
 
     function handleKeyPress(key) {
-      if (key === "←") {
-        keyboardInput.value = keyboardInput.value.slice(0, -1);
-      } else if (key === "⏎") {
-        submitLoginCode(keyboardInput.value.trim().toUpperCase());
+      if (key === "DEL") {
+        codeInput.value = codeInput.value.slice(0, -1);
+      } else if (key === "OK") {
+        validateCode(codeInput.value.trim().toUpperCase());
       } else {
-        keyboardInput.value += key;
+        if (codeInput.value.length < 20) {
+          codeInput.value += key;
+        }
       }
     }
 
-    async function submitLoginCode(code) {
-      try {
-        const docRef = doc(db, "loginCodes", code);
-        const docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-          alert("❌ Invalid code.");
-          return;
-        }
-
+    async function validateCode(code) {
+      if (!code) return alert("Enter a code.");
+      const docRef = doc(db, "loginCodes", code);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
         const data = docSnap.data();
-        const expiresAt = new Date(data.expiresAt);
-
-        if (expiresAt <= new Date()) {
-          alert("⚠️ Code expired.");
-          return;
-        }
-
-        localStorage.setItem("login_expire", expiresAt.getTime());
-        keyboardModal.style.display = "none";
-        updateAccessState();
-      } catch (err) {
-        alert("⚠️ Login failed: " + err.message);
+        const expiresAt = new Date(data.expiresAt.seconds * 1000);
+        localStorage.setItem("expiresAt", expiresAt.toISOString());
+        unlockChannels();
+        updateCountdown();
+        keyboardContainer.style.display = "none";
+        loginBtn.style.display = "none";
+        codeInput.style.display = "none";
+        alert("✅ Code accepted!");
+      } else {
+        alert("❌ Invalid code.");
+        codeInput.value = "";
       }
-    }
-
-    function lockChannels() {
-      document.querySelectorAll('.box').forEach(b => b.classList.remove("unlocked"));
     }
 
     function unlockChannels() {
-      document.querySelectorAll('.box').forEach(b => b.classList.add("unlocked"));
+      document.querySelectorAll(".box").forEach(box => {
+        box.classList.remove("locked");
+      });
     }
 
-    function updateAccessState() {
-      const expireAt = parseInt(localStorage.getItem("login_expire"));
-      const loginBtn = document.getElementById("loginBtn");
-
-      if (!expireAt || isNaN(expireAt)) {
-        lockChannels();
-        countdownEl.textContent = "🔒 Please login to unlock.";
-        loginBtn.style.display = "inline-block";
-        return;
-      }
-
-      const now = Date.now();
-      const remaining = expireAt - now;
-
-      if (remaining <= 0) {
-        localStorage.removeItem("login_expire");
-        lockChannels();
-        countdownEl.textContent = "🔒 Access expired. Please login again.";
-        loginBtn.style.display = "inline-block";
-        return;
-      }
-
-      unlockChannels();
-      loginBtn.style.display = "none";
-
-      const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((remaining / (1000 * 60)) % 60);
-      const secs = Math.floor((remaining / 1000) % 60);
-
-      countdownEl.textContent = `🔓 Access expires in: ${days}d ${hours}h ${mins}m ${secs}s`;
-      setTimeout(updateAccessState, 1000);
+    function lockChannels() {
+      document.querySelectorAll(".box").forEach(box => {
+        box.classList.add("locked");
+      });
     }
 
-    document.addEventListener('keydown', function (e) {
-      if (keyboardModal.style.display === "block") return;
+    function updateCountdown() {
+      const expires = new Date(localStorage.getItem("expiresAt"));
+      if (!expires) return;
 
-      const focusable = Array.from(document.querySelectorAll('.box.unlocked'));
-      const currentIndex = focusable.indexOf(document.activeElement);
-      const cols = Math.floor(window.innerWidth / 180);
+      function tick() {
+        const now = new Date();
+        const diff = expires - now;
+        if (diff <= 0) {
+          countdownEl.textContent = "🔒 Code expired.";
+          lockChannels();
+          loginBtn.style.display = "inline-block";
+          codeInput.style.display = "block";
+          keyboardContainer.style.display = "none";
+          return;
+        }
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        countdownEl.textContent = `⏳ Time left: ${hours}h ${mins}m ${secs}s`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    }
 
-      if (e.key === 'ArrowRight') {
-        focusable[currentIndex + 1]?.focus();
-      } else if (e.key === 'ArrowLeft') {
-        focusable[currentIndex - 1]?.focus();
-      } else if (e.key === 'ArrowDown') {
-        focusable[currentIndex + cols]?.focus();
-      } else if (e.key === 'ArrowUp') {
-        focusable[currentIndex - cols]?.focus();
-      } else if (e.key === 'Enter') {
-        document.activeElement?.click();
+    // On load
+    window.addEventListener("DOMContentLoaded", () => {
+      const expires = localStorage.getItem("expiresAt");
+      if (expires && new Date() < new Date(expires)) {
+        unlockChannels();
+        loginBtn.style.display = "none";
+        codeInput.style.display = "none";
+        updateCountdown();
+      } else {
+        lockChannels();
+        loginBtn.style.display = "inline-block";
       }
     });
-
-    window.onload = () => {
-      updateAccessState();
-      const loginBtn = document.getElementById("loginBtn");
-      const expireAt = parseInt(localStorage.getItem("login_expire"));
-
-      if (!expireAt || Date.now() > expireAt) {
-        loginBtn.focus();
-      } else {
-        const firstUnlocked = document.querySelector('.box.unlocked');
-        if (firstUnlocked) firstUnlocked.focus();
-      }
-    };
   </script>
 </body>
 </html>
