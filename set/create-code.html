@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,10 +85,9 @@
   <h2>KONEK TV PANEL</h2>
   <input type="text" id="code" placeholder="Enter new code" maxlength="30" />
   <select id="duration">
-    <option value="1m">1 Minute (Test)</option>
-    <option value="7d">7 Days</option>
-    <option value="15d">15 Days</option>
-    <option value="30d">30 Days</option>
+    <option value="30">30 Days</option>
+    <option value="15">15 Days</option>
+    <option value="7">7 Days</option>
   </select>
   <button id="createBtn">Add Code</button>
   <div id="message"></div>
@@ -129,19 +129,9 @@
       messageEl.style.color = color;
     };
 
-    function parseDuration(value) {
-      if (value.endsWith("m")) {
-        return { unit: "minutes", value: parseInt(value) };
-      } else if (value.endsWith("d")) {
-        return { unit: "days", value: parseInt(value) };
-      }
-      return { unit: "days", value: 30 }; // default fallback
-    }
-
     async function createCode() {
       const code = codeInput.value.trim();
-      const rawDuration = durationSelect.value;
-      const { unit, value } = parseDuration(rawDuration);
+      const duration = parseInt(durationSelect.value);
 
       if (code.length < 4) {
         showMessage("⚠️ Code must be at least 4 characters", "#ff6666");
@@ -150,11 +140,11 @@
 
       try {
         await setDoc(doc(db, "codes", code), {
-          duration: rawDuration,
+          duration,
           createdAt: serverTimestamp(),
           revoked: false
         });
-        showMessage(`✅ Code "${code}" created for ${value} ${unit}`);
+        showMessage(`✅ Code "${code}" created for ${duration} days`);
         codeInput.value = "";
       } catch (e) {
         console.error(e);
@@ -184,19 +174,12 @@
       }
     }
 
-    function getExpirationTime(createdAt, rawDuration) {
-      const { unit, value } = parseDuration(rawDuration);
-      const expiresAt = new Date(createdAt);
+    document.getElementById("createBtn").addEventListener("click", createCode);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") createCode();
+    });
 
-      if (unit === "minutes") {
-        expiresAt.setMinutes(expiresAt.getMinutes() + value);
-      } else {
-        expiresAt.setDate(expiresAt.getDate() + value);
-      }
-
-      return expiresAt;
-    }
-
+    // ⏳ Auto-delete expired codes
     function checkAndDeleteExpiredCodes(snapshot) {
       const now = new Date();
 
@@ -207,15 +190,17 @@
         if (!data.createdAt || data.revoked) return;
 
         const createdAt = data.createdAt.toDate();
-        const expiresAt = getExpirationTime(createdAt, data.duration);
+        const expiresAt = new Date(createdAt);
+        expiresAt.setDate(expiresAt.getDate() + data.duration);
 
         if (now > expiresAt) {
-          console.log(`🧹 Auto-deleting expired code: ${code}`);
+          console.log(`🔁 Auto-deleting expired code: ${code}`);
           await deleteDoc(doc(db, "codes", code));
         }
       });
     }
 
+    // 🔄 Live updates with expiration checks
     onSnapshot(collection(db, "codes"), (snapshot) => {
       codeList.innerHTML = "";
       checkAndDeleteExpiredCodes(snapshot);
@@ -232,7 +217,7 @@
         codeItem.className = "code-item";
         codeItem.innerHTML = `
           <div class="code-info">
-            <div><strong>${code}</strong> (${data.duration})</div>
+            <div><strong>${code}</strong> (${data.duration}d)</div>
             <div>Created: ${created}</div>
             <div>Status: ${status}</div>
           </div>
@@ -245,6 +230,7 @@
       });
     });
 
+    // Global access for buttons
     window.deleteCode = deleteCode;
     window.toggleCodeStatus = toggleCodeStatus;
   </script>
