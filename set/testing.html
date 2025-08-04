@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Create & Manage Login Codes</title>
+  <title>KONEK TV PANEL</title>
   <style>
     body {
       background: #121212;
@@ -64,19 +64,21 @@
       padding: 12px;
       margin-bottom: 8px;
       border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       font-size: 14px;
     }
 
-    .code-info {
-      flex: 1;
-      margin-right: 10px;
+    .code-item div {
+      margin: 2px 0;
     }
 
-    .code-actions button {
-      margin-left: 5px;
+    .delete-button {
+      background: #ff4444;
+      color: white;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
     }
   </style>
 </head>
@@ -90,7 +92,6 @@
   </select>
   <button id="createBtn">Add Code</button>
   <div id="message"></div>
-
   <div class="code-list" id="codeList"></div>
 
   <script type="module">
@@ -101,7 +102,6 @@
       doc,
       setDoc,
       deleteDoc,
-      updateDoc,
       onSnapshot,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
@@ -131,7 +131,6 @@
     async function createCode() {
       const code = codeInput.value.trim();
       const duration = parseInt(durationSelect.value);
-
       if (code.length < 4) {
         showMessage("⚠️ Code must be at least 4 characters", "#ff6666");
         return;
@@ -140,8 +139,7 @@
       try {
         await setDoc(doc(db, "codes", code), {
           duration,
-          createdAt: serverTimestamp(),
-          revoked: false
+          createdAt: serverTimestamp()
         });
         showMessage(`✅ Code "${code}" created for ${duration} days`);
         codeInput.value = "";
@@ -161,18 +159,47 @@
       }
     }
 
-    async function toggleCodeStatus(code, currentStatus) {
-      const newStatus = !currentStatus;
-      try {
-        await updateDoc(doc(db, "codes", code), {
-          revoked: newStatus
-        });
-        const statusText = newStatus ? "disabled" : "enabled";
-        showMessage(`🔁 Code "${code}" ${statusText}`, "#ffa500");
-      } catch (e) {
-        console.error(e);
-        showMessage("❌ Failed to update code status", "#ff4444");
-      }
+    function getRemainingTime(createdAt, duration) {
+      const expiresAt = new Date(createdAt);
+      expiresAt.setDate(expiresAt.getDate() + duration);
+      const now = new Date();
+      const diffMs = expiresAt - now;
+      if (diffMs <= 0) return "Expired";
+
+      const seconds = Math.floor(diffMs / 1000);
+      const days = Math.floor(seconds / (3600 * 24));
+      const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${days}d ${hours}h ${minutes}m ${secs}s`;
+    }
+
+    function startCountdown(codeId, createdAt, duration) {
+      const countdownEl = document.getElementById(`countdown-${codeId}`);
+      const interval = setInterval(() => {
+        const remaining = getRemainingTime(createdAt, duration);
+        if (remaining === "Expired") {
+          clearInterval(interval);
+          deleteCode(codeId);
+        } else {
+          countdownEl.textContent = `Expires in: ${remaining}`;
+        }
+      }, 1000);
+    }
+
+    function checkAndDeleteExpiredCodes(snapshot) {
+      const now = new Date();
+      snapshot.forEach(async (docSnap) => {
+        const data = docSnap.data();
+        const code = docSnap.id;
+        if (!data.createdAt) return;
+        const createdAt = data.createdAt.toDate();
+        const expiresAt = new Date(createdAt);
+        expiresAt.setDate(expiresAt.getDate() + data.duration);
+        if (now > expiresAt) {
+          await deleteDoc(doc(db, "codes", code));
+        }
+      });
     }
 
     document.getElementById("createBtn").addEventListener("click", createCode);
@@ -180,56 +207,30 @@
       if (e.key === "Enter") createCode();
     });
 
-    function checkAndDeleteExpiredCodes(snapshot) {
-      const now = new Date();
-      snapshot.forEach(async (docSnap) => {
-        const data = docSnap.data();
-        const code = docSnap.id;
-
-        if (!data.createdAt || data.revoked) return;
-
-        const createdAt = data.createdAt.toDate();
-        const expiresAt = new Date(createdAt);
-        expiresAt.setDate(expiresAt.getDate() + data.duration);
-
-        if (now > expiresAt) {
-          console.log(`⏳ Auto-deleting expired code: ${code}`);
-          await deleteDoc(doc(db, "codes", code));
-        }
-      });
-    }
-
     onSnapshot(collection(db, "codes"), (snapshot) => {
       codeList.innerHTML = "";
       checkAndDeleteExpiredCodes(snapshot);
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const code = doc.id;
-        const created = data.createdAt?.toDate().toLocaleString() ?? "Pending...";
-        const isRevoked = !!data.revoked;
-        const status = isRevoked ? "❌ Disabled" : "✅ Enabled";
-        const toggleLabel = isRevoked ? "Enable" : "Disable";
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const code = docSnap.id;
+        const createdAt = data.createdAt?.toDate();
+        if (!createdAt) return;
 
         const codeItem = document.createElement("div");
         codeItem.className = "code-item";
         codeItem.innerHTML = `
-          <div class="code-info">
-            <div><strong>${code}</strong> (${data.duration}d)</div>
-            <div>Created: ${created}</div>
-            <div>Status: ${status}</div>
-          </div>
-          <div class="code-actions">
-            <button onclick="deleteCode('${code}')">Delete</button>
-            <button onclick="toggleCodeStatus('${code}', ${isRevoked})">${toggleLabel}</button>
-          </div>
+          <div><strong>${code}</strong> (${data.duration}d)</div>
+          <div>Created: ${createdAt.toLocaleString()}</div>
+          <div id="countdown-${code}">Checking expiration...</div>
+          <div><button class="delete-button" onclick="deleteCode('${code}')">Delete</button></div>
         `;
         codeList.appendChild(codeItem);
+        startCountdown(code, createdAt, data.duration);
       });
     });
 
     window.deleteCode = deleteCode;
-    window.toggleCodeStatus = toggleCodeStatus;
   </script>
 </body>
 </html>
