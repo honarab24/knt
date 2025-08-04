@@ -2,62 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>KONEK TV LOGIN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #000;
-      color: #fff;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    #loginSection, #contentSection {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 18px;
-      width: 250px;
-      text-align: center;
-    }
-    button:focus, input:focus {
-      outline: 2px solid #0f0;
-    }
-    .expired {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-  <div id="loginSection">
-    <h2>Enter Login Code</h2>
-    <input id="codeInput" type="text" placeholder="Enter Code" autofocus />
-    <button id="loginBtn">Login</button>
-    <p id="statusMsg"></p>
-  </div>
-
-  <div id="contentSection">
-    <h2>Welcome to KONEK TV</h2>
-    <p>Access expires in: <span id="countdown"></span></p>
-    <button id="logoutBtn">Logout</button>
-    <!-- Place your unlocked IPTV UI here -->
-  </div>
-
+  <title>Login Code - KonekTV</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    // ✅ Your Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
       authDomain: "konektv-login.firebaseapp.com",
@@ -67,102 +17,124 @@
       appId: "1:289819667898:web:4b95994fc6a27c84f78183"
     };
 
-    // 🔥 Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM Elements
-    const codeInput = document.getElementById('codeInput');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginSection = document.getElementById('loginSection');
-    const contentSection = document.getElementById('contentSection');
-    const statusMsg = document.getElementById('statusMsg');
-    const countdown = document.getElementById('countdown');
-
-    let interval;
-
-    // 🔄 Auto-check local storage
-    const savedCode = localStorage.getItem('loginCode');
-    const savedExpire = localStorage.getItem('expiresAt');
-    if (savedCode && savedExpire && new Date(savedExpire) > new Date()) {
-      showContent(savedExpire);
-    } else {
-      showLogin();
-    }
-
-    // 🔐 Login button action
-    loginBtn.addEventListener('click', async () => {
-      const code = codeInput.value.trim();
-      if (!code) return;
-
-      statusMsg.textContent = "Checking...";
-      try {
-        const codeRef = doc(db, "loginCodes", code);
-        const codeSnap = await getDoc(codeRef);
-
-        if (!codeSnap.exists()) {
-          statusMsg.textContent = "❌ Invalid code.";
-          return;
-        }
-
-        const data = codeSnap.data();
-        const expiresAt = new Date(data.expiresAt);
-
-        if (expiresAt <= new Date()) {
-          statusMsg.textContent = "⚠️ Code expired.";
-          return;
-        }
-
-        // ✅ Valid code
-        localStorage.setItem("loginCode", code);
-        localStorage.setItem("expiresAt", expiresAt.toISOString());
-        showContent(expiresAt.toISOString());
-
-      } catch (err) {
-        statusMsg.textContent = "⚠️ Error: " + err.message;
-      }
-    });
-
-    // 🔓 Logout
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem("loginCode");
-      localStorage.removeItem("expiresAt");
-      clearInterval(interval);
-      showLogin();
-    });
-
-    // 👁️‍🗨️ UI Handlers
-    function showLogin() {
-      loginSection.style.display = "flex";
-      contentSection.style.display = "none";
-      codeInput.focus();
-    }
-
-    function showContent(expiresAt) {
-      loginSection.style.display = "none";
-      contentSection.style.display = "flex";
-      updateCountdown(expiresAt);
-      interval = setInterval(() => updateCountdown(expiresAt), 1000);
-    }
-
-    function updateCountdown(expiresAt) {
-      const now = new Date();
-      const end = new Date(expiresAt);
-      const diff = end - now;
-
-      if (diff <= 0) {
-        countdown.textContent = "Expired";
-        logoutBtn.click(); // auto logout
+    async function submitCode() {
+      const input = document.getElementById("codeInput");
+      const code = input.value.trim().toUpperCase();
+      if (!code) {
+        alert("⛔ Please enter a login code.");
         return;
       }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      const secs = Math.floor((diff / 1000) % 60);
-      countdown.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`;
+      const docRef = doc(db, "codes", code);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const days = parseInt(docSnap.data().days);
+        const expireAt = Date.now() + days * 24 * 60 * 60 * 1000;
+        localStorage.setItem("login_expire", expireAt);
+        localStorage.setItem("login_code", code);
+        alert(`✅ Login code valid for ${days} days.`);
+        window.location.href = "index.html";
+      } else {
+        alert("❌ Invalid login code.");
+        input.value = "";
+        input.focus();
+      }
     }
+
+    window.submitCode = submitCode;
+
+    // Support ENTER key on remote/keyboard
+    window.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("codeInput");
+      input.focus();
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          submitCode();
+        }
+      });
+    });
   </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #00ffd5;
+    }
+
+    input {
+      font-size: 22px;
+      padding: 14px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      border-radius: 10px;
+      border: 2px solid #00ffd5;
+      background-color: #111;
+      color: #fff;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #00ff88;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 12px 32px;
+      background-color: #00ffd5;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover,
+    button:focus {
+      background-color: #00ccaa;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
+      input {
+        font-size: 18px;
+      }
+      button {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Enter Login Code</h1>
+  <input type="text" id="codeInput" placeholder="e.g. KONEK30" maxlength="20" />
+  <button onclick="submitCode()">Unlock</button>
 </body>
 </html>
