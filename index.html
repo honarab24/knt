@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,223 +7,146 @@
   <style>
     body {
       margin: 0;
-      background: #000;
-      color: #fff;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      min-height: 100vh;
+      background-color: #121212;
+      color: white;
+      overflow-x: hidden;
     }
+
     h1 {
-      margin-top: 10px;
+      text-align: center;
       color: #00ffd5;
+      padding: 20px 0 10px;
+      font-size: 24px;
     }
+
+    #countdown {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px;
-      padding: 10px;
-      width: 100%;
-      max-width: 1000px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 0 20px 40px;
     }
+
     .box {
-      background: #111;
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      border-radius: 15px;
+      text-align: center;
       padding: 20px;
-      text-align: center;
-      border-radius: 10px;
-      cursor: pointer;
-      border: 2px solid #00ffd5;
+      transition: 0.3s ease;
       outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
-    .box.locked {
-      opacity: 0.5;
-      pointer-events: none;
-    }
+
     .box:focus {
-      border-color: yellow;
+      border: 3px solid #00ffd5;
+      transform: scale(1.05);
     }
-    #loginBtn {
-      padding: 12px 24px;
-      font-size: 18px;
-      margin: 10px;
-      background: #00ffd5;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+
+    .box:hover {
+      background-color: #00ffd5;
+      color: black;
     }
-    #keyboardContainer {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 5px;
-      margin: 10px;
+
+    .box img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
     }
-    .key {
-      padding: 12px 16px;
-      background: #222;
-      color: #fff;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid #444;
+
+    .box span {
+      font-size: 16px;
+      font-weight: bold;
+      display: block;
     }
-    .key:hover {
-      background: #00ffd5;
-      color: #000;
-    }
-    #codeInput {
-      font-size: 20px;
-      padding: 10px;
-      margin: 10px;
-      width: 220px;
-      text-align: center;
-      background: #111;
-      border: 2px solid #00ffd5;
-      color: #fff;
-      border-radius: 8px;
-      outline: none;
-    }
-    #countdown {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #ccc;
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .box img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .box {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>KONEK TV</h1>
-  <button id="loginBtn">Login Code</button>
-  <div id="countdown"></div>
-  <input type="text" id="codeInput" placeholder="Enter code" maxlength="20" />
-  <div id="keyboardContainer"></div>
+  <h1>KONEK TV HOME</h1>
+  <div id="countdown">📺 Choose a channel to watch.</div>
 
   <div class="grid">
-    <div class="box locked" tabindex="0">Channel 1</div>
-    <div class="box locked" tabindex="0">Channel 2</div>
-    <div class="box locked" tabindex="0">Channel 3</div>
-    <div class="box locked" tabindex="0">Channel 4</div>
+    <!-- 🔐 LOGIN CODE BUTTON -->
+    <div class="box" tabindex="1" onclick="openChannel('login-code')">
+      <img src="https://img.icons8.com/fluency/96/lock-2.png" alt="Login" />
+      <span>Login Code</span>
+    </div>
+
+    <div class="box" tabindex="1" onclick="openChannel('phchannel')">
+      <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
+      <span>Philippines Channel</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('astro')">
+      <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
+      <span>ASTRO</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('netflix')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
+      <span>Netflix</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('primev')">
+      <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
+      <span>Prime Video</span>
+    </div>
+    <div class="box" tabindex="1" onclick="openChannel('phmovies')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
+      <span>PH MOVIES</span>
+    </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  <script>
+    function openChannel(id) {
+      if (id === 'login-code') {
+        window.location.href = 'login-code.html';
+      } else {
+        window.location.href = 'go:' + id;
+      }
+    }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
-      authDomain: "konektv-login.firebaseapp.com",
-      projectId: "konektv-login",
-      storageBucket: "konektv-login.firebasestorage.app",
-      messagingSenderId: "289819667898",
-      appId: "1:289819667898:web:4b95994fc6a27c84f78183"
+    document.addEventListener('keydown', function (e) {
+      const focusable = Array.from(document.querySelectorAll('.box'));
+      const currentIndex = focusable.indexOf(document.activeElement);
+      const cols = Math.floor(window.innerWidth / 180);
+
+      if (e.key === 'ArrowRight') {
+        focusable[currentIndex + 1]?.focus();
+      } else if (e.key === 'ArrowLeft') {
+        focusable[currentIndex - 1]?.focus();
+      } else if (e.key === 'ArrowDown') {
+        focusable[currentIndex + cols]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        focusable[currentIndex - cols]?.focus();
+      } else if (e.key === 'Enter') {
+        document.activeElement?.click();
+      }
+    });
+
+    window.onload = () => {
+      const first = document.querySelector('.box');
+      if (first) first.focus();
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const loginBtn = document.getElementById("loginBtn");
-    const keyboardContainer = document.getElementById("keyboardContainer");
-    const codeInput = document.getElementById("codeInput");
-    const countdownEl = document.getElementById("countdown");
-
-    const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("").concat(["DEL", "OK"]);
-
-    keys.forEach(key => {
-      const btn = document.createElement("button");
-      btn.className = "key";
-      btn.textContent = key;
-      btn.onclick = () => handleKeyPress(key);
-      keyboardContainer.appendChild(btn);
-    });
-
-    loginBtn.addEventListener("click", () => {
-      keyboardContainer.style.display = "flex";
-      codeInput.style.display = "block";
-      codeInput.focus();
-    });
-
-    function handleKeyPress(key) {
-      if (key === "DEL") {
-        codeInput.value = codeInput.value.slice(0, -1);
-      } else if (key === "OK") {
-        validateCode(codeInput.value.trim().toUpperCase());
-      } else {
-        if (codeInput.value.length < 20) {
-          codeInput.value += key;
-        }
-      }
-    }
-
-    async function validateCode(code) {
-      if (!code) return alert("Enter a code.");
-      const docRef = doc(db, "loginCodes", code);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const expiresAt = new Date(data.expiresAt.seconds * 1000);
-        localStorage.setItem("expiresAt", expiresAt.toISOString());
-        unlockChannels();
-        updateCountdown();
-        keyboardContainer.style.display = "none";
-        loginBtn.style.display = "none";
-        codeInput.style.display = "none";
-        alert("✅ Code accepted!");
-      } else {
-        alert("❌ Invalid code.");
-        codeInput.value = "";
-      }
-    }
-
-    function unlockChannels() {
-      document.querySelectorAll(".box").forEach(box => {
-        box.classList.remove("locked");
-      });
-    }
-
-    function lockChannels() {
-      document.querySelectorAll(".box").forEach(box => {
-        box.classList.add("locked");
-      });
-    }
-
-    function updateCountdown() {
-      const expires = new Date(localStorage.getItem("expiresAt"));
-      if (!expires) return;
-
-      function tick() {
-        const now = new Date();
-        const diff = expires - now;
-        if (diff <= 0) {
-          countdownEl.textContent = "🔒 Code expired.";
-          lockChannels();
-          loginBtn.style.display = "inline-block";
-          codeInput.style.display = "block";
-          keyboardContainer.style.display = "none";
-          return;
-        }
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        countdownEl.textContent = `⏳ Time left: ${hours}h ${mins}m ${secs}s`;
-        requestAnimationFrame(tick);
-      }
-      tick();
-    }
-
-    // On load
-    window.addEventListener("DOMContentLoaded", () => {
-      const expires = localStorage.getItem("expiresAt");
-      if (expires && new Date() < new Date(expires)) {
-        unlockChannels();
-        loginBtn.style.display = "none";
-        codeInput.style.display = "none";
-        updateCountdown();
-      } else {
-        lockChannels();
-        loginBtn.style.display = "inline-block";
-      }
-    });
   </script>
 </body>
 </html>
