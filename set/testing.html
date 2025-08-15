@@ -137,7 +137,7 @@
           duration,
           createdAt: serverTimestamp()
         });
-        showMessage(`✅ Code "${code}" created for ${duration} days`);
+        showMessage(`✅ Code "${code}" created for ${duration} days (+1 day auto)`);
         codeInput.value = "";
       } catch (e) {
         console.error(e);
@@ -197,7 +197,7 @@
 
         const createdAt = data.createdAt.toDate();
         const expiry = new Date(createdAt);
-        expiry.setDate(expiry.getDate() + data.duration);
+        expiry.setDate(expiry.getDate() + data.duration + 1); // ✅ Added 1 extra day
 
         // Skip already expired (will auto-delete)
         if (new Date() > expiry) {
@@ -209,7 +209,7 @@
         codeItem.className = "code-item";
         codeItem.innerHTML = `
           <div>
-            <div><strong>${code}</strong> (${data.duration}d)</div>
+            <div><strong>${code}</strong> (${data.duration + 1}d)</div>
             <div>Created: ${createdAt.toLocaleString()}</div>
             <div class="countdown" id="countdown-${code}">⏳ Checking...</div>
           </div>
