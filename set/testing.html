@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +84,7 @@
     <option value="30">30 Days</option>
     <option value="15">15 Days</option>
     <option value="7">7 Days</option>
+  <option value="1">1 Days</option>
   </select>
   <button id="createBtn">Add Code</button>
   <div id="message"></div>
@@ -137,7 +139,7 @@
           duration,
           createdAt: serverTimestamp()
         });
-        showMessage(`✅ Code "${code}" created for ${duration} days (+1 day auto)`);
+        showMessage(`✅ Code "${code}" created for ${duration} days`);
         codeInput.value = "";
       } catch (e) {
         console.error(e);
@@ -197,7 +199,7 @@
 
         const createdAt = data.createdAt.toDate();
         const expiry = new Date(createdAt);
-        expiry.setDate(expiry.getDate() + data.duration + 1); // ✅ Added 1 extra day
+        expiry.setDate(expiry.getDate() + data.duration);
 
         // Skip already expired (will auto-delete)
         if (new Date() > expiry) {
@@ -209,7 +211,7 @@
         codeItem.className = "code-item";
         codeItem.innerHTML = `
           <div>
-            <div><strong>${code}</strong> (${data.duration + 1}d)</div>
+            <div><strong>${code}</strong> (${data.duration}d)</div>
             <div>Created: ${createdAt.toLocaleString()}</div>
             <div class="countdown" id="countdown-${code}">⏳ Checking...</div>
           </div>
