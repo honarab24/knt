@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just Like Old Friends</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: white;
+        text-align: center;
+    }
+    .header {
+        display: flex;
+        align-items: center;
+        background: #1e1e1e;
+        padding: 10px;
+        border-bottom: 2px solid #333;
+    }
+    .header img {
+        height: 50px;
+        margin-right: 10px;
+    }
+    .header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    video {
+        width: 100%;
+        max-height: 500px;
+        background: black;
+    }
+    .episodes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+    .episodes button {
+        padding: 5px;
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 4px;
+        background: #333;
+        color: white;
+        cursor: pointer;
+    }
+    .episodes button:hover {
+        background: #555;
+    }
+</style>
+</head>
+<body>
+
+<!-- Logo + Title -->
+<div class="header">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqJqVZ1r0iYndZs_G1xcnX29MtjWGOzZUDkM0n62-Kws5s-kBP0_6St7Yi&s=10" alt="Series Logo">
+    <h1>The Face Of The Billionaire Maid</h1>
+</div>
+
+<!-- Video Player -->
+<video id="video" controls></video>
+
+<!-- Episode Buttons -->
+<div class="episodes" id="episodes"></div>
+
+<script>
+    // List only actual episodes
+    const episodes = [
+        { num: 1, url: "https://cdn-aws9.spicychiliti.com/hls/20000/1/1._1080p.m3u8" },
+        { num: 2, url: "https://cdn-aws9.spicychiliti.com/hls/20000/2/2._1080p.m3u8" },
+{ num: 3, url: "https://cdn-aws9.spicychiliti.com/hls/20000/3/3._1080p.m3u8" },
+{ num: 4, url: "https://cdn-aws9.spicychiliti.com/hls/20000/4/4._1080p.m3u8" },
+{ num: 5, url: "https://cdn-aws9.spicychiliti.com/hls/20000/5/5._1080p.m3u8" },
+{ num: 6, url: "https://cdn-aws9.spicychiliti.com/hls/20000/6/6._1080p.m3u8" },
+{ num: 7, url: "https://cdn-aws9.spicychiliti.com/hls/20000/7/7._1080p.m3u8" },
+{ num: 8, url: "https://cdn-aws9.spicychiliti.com/hls/20000/8/8._1080p.m3u8" },
+{ num: 9, url: "https://cdn-aws9.spicychiliti.com/hls/20000/9/9._1080p.m3u8" },
+{ num: 10, url: "https://cdn-aws9.spicychiliti.com/hls/20000/10/10._1080p.m3u8" },
+{ num: 11, url: "https://cdn-aws9.spicychiliti.com/hls/20000/11/11._1080p.m3u8" },
+{ num: 12, url: "https://cdn-aws9.spicychiliti.com/hls/20000/12/12._1080p.m3u8" },
+{ num: 13, url: "https://cdn-aws9.spicychiliti.com/hls/20000/13/13._1080p.m3u8" },
+{ num: 14, url: "https://cdn-aws9.spicychiliti.com/hls/20000/14/14._1080p.m3u8" },
+{ num: 15, url: "https://cdn-aws9.spicychiliti.com/hls/20000/15/15._1080p.m3u8" },
+{ num: 16, url: "https://cdn-aws9.spicychiliti.com/hls/20000/16/16._1080p.m3u8" },
+{ num: 17, url: "https://cdn-aws9.spicychiliti.com/hls/20000/17/17._1080p.m3u8" },
+{ num: 18, url: "https://cdn-aws9.spicychiliti.com/hls/20000/18/18._1080p.m3u8" },
+{ num: 19, url: "https://cdn-aws9.spicychiliti.com/hls/20000/19/19._1080p.m3u8" },
+{ num: 20, url: "https://cdn-aws9.spicychiliti.com/hls/20000/20/20._1080p.m3u8" },
+{ num: 21, url: "https://cdn-aws9.spicychiliti.com/hls/20000/21/21._1080p.m3u8" },
+{ num: 22, url: "https://cdn-aws9.spicychiliti.com/hls/20000/22/22._1080p.m3u8" },
+{ num: 23, url: "https://cdn-aws9.spicychiliti.com/hls/20000/23/23._1080p.m3u8" },
+{ num: 24, url: "https://cdn-aws9.spicychiliti.com/hls/20000/24/24._1080p.m3u8" },
+{ num: 25, url: "https://cdn-aws9.spicychiliti.com/hls/20000/25/25._1080p.m3u8" },
+{ num: 26, url: "https://cdn-aws9.spicychiliti.com/hls/20000/26/26._1080p.m3u8" },
+        { num: 27, url: "https://cdn-aws9.spicychiliti.com/hls/20000/27/27._1080p.m3u8" },
+        { num: 28, url: "https://cdn-aws9.spicychiliti.com/hls/20000/28/28._1080p.m3u8" },
+{ num: 29, url: "https://cdn-aws9.spicychiliti.com/hls/20000/29/29._1080p.m3u8" },
+{ num: 30, url: "https://cdn-aws9.spicychiliti.com/hls/20000/30/30._1080p.m3u8" },
+{ num: 31, url: "https://cdn-aws9.spicychiliti.com/hls/20000/31/31._1080p.m3u8" },
+{ num: 32, url: "https://cdn-aws9.spicychiliti.com/hls/20000/32/32._1080p.m3u8" },
+{ num: 33, url: "https://cdn-aws9.spicychiliti.com/hls/20000/33/33._1080p.m3u8" },
+{ num: 34, url: "https://cdn-aws9.spicychiliti.com/hls/20000/34/34._1080p.m3u8" },
+{ num: 35, url: "https://cdn-aws9.spicychiliti.com/hls/20000/35/35._1080p.m3u8" },
+{ num: 36, url: "https://cdn-aws9.spicychiliti.com/hls/20000/36/36._1080p.m3u8" },
+{ num: 37, url: "https://cdn-aws9.spicychiliti.com/hls/20000/37/37._1080p.m3u8" },
+{ num: 38, url: "https://cdn-aws9.spicychiliti.com/hls/20000/38/38._1080p.m3u8" },
+{ num: 39, url: "https://cdn-aws9.spicychiliti.com/hls/20000/39/39._1080p.m3u8" },
+{ num: 40, url: "https://cdn-aws9.spicychiliti.com/hls/20000/40/40._1080p.m3u8" },
+{ num: 41, url: "https://cdn-aws9.spicychiliti.com/hls/20000/41/41._1080p.m3u8" },
+{ num: 42, url: "https://cdn-aws9.spicychiliti.com/hls/20000/42/42._1080p.m3u8" },
+{ num: 43, url: "https://cdn-aws9.spicychiliti.com/hls/20000/43/43._1080p.m3u8" },
+{ num: 44, url: "https://cdn-aws9.spicychiliti.com/hls/20000/44/44._1080p.m3u8" },
+{ num: 45, url: "https://cdn-aws9.spicychiliti.com/hls/20000/45/45._1080p.m3u8" },
+{ num: 46, url: "https://cdn-aws9.spicychiliti.com/hls/20000/46/46._1080p.m3u8" },
+{ num: 47, url: "https://cdn-aws9.spicychiliti.com/hls/20000/47/47._1080p.m3u8" },
+{ num: 48, url: "https://cdn-aws9.spicychiliti.com/hls/20000/48/48._1080p.m3u8" },
+{ num: 49, url: "https://cdn-aws9.spicychiliti.com/hls/20000/49/49._1080p.m3u8" },
+{ num: 50, url: "https://cdn-aws9.spicychiliti.com/hls/20000/50/50._1080p.m3u8" },
+{ num: 51, url: "https://cdn-aws9.spicychiliti.com/hls/20000/51/51._1080p.m3u8" },
+{ num: 52, url: "https://cdn-aws9.spicychiliti.com/hls/20000/52/52._1080p.m3u8" },
+        { num: 53, url: "https://cdn-aws9.spicychiliti.com/hls/20000/53/53._1080p.m3u8" },
+        { num: 54, url: "https://cdn-aws9.spicychiliti.com/hls/20000/54/54._1080p.m3u8" },
+{ num: 55, url: "https://cdn-aws9.spicychiliti.com/hls/20000/55/55._1080p.m3u8" },
+{ num: 56, url: "https://cdn-aws9.spicychiliti.com/hls/20000/56/56._1080p.m3u8" },
+{ num: 57, url: "https://cdn-aws9.spicychiliti.com/hls/20000/57/57._1080p.m3u8" },
+{ num: 58, url: "https://cdn-aws9.spicychiliti.com/hls/20000/58/58._1080p.m3u8" },
+{ num: 59, url: "https://cdn-aws9.spicychiliti.com/hls/20000/59/59._1080p.m3u8" },
+{ num: 60, url: "https://cdn-aws9.spicychiliti.com/hls/20000/60/60._1080p.m3u8" },
+{ num: 61, url: "https://cdn-aws9.spicychiliti.com/hls/20000/61/61._1080p.m3u8" },
+{ num: 62, url: "https://cdn-aws9.spicychiliti.com/hls/20000/62/62._1080p.m3u8" },
+{ num: 63, url: "https://cdn-aws9.spicychiliti.com/hls/20000/63/63._1080p.m3u8" },
+{ num: 64, url: "https://cdn-aws9.spicychiliti.com/hls/20000/64/64._1080p.m3u8" },
+{ num: 65, url: "https://cdn-aws9.spicychiliti.com/hls/20000/65/65._1080p.m3u8" },
+{ num: 66, url: "https://cdn-aws9.spicychiliti.com/hls/20000/66/66._1080p.m3u8" },
+{ num: 67, url: "https://cdn-aws9.spicychiliti.com/hls/20000/67/67._1080p.m3u8" },
+{ num: 68, url: "https://cdn-aws9.spicychiliti.com/hls/20000/68/68._1080p.m3u8" },
+{ num: 69, url: "https://cdn-aws9.spicychiliti.com/hls/20000/69/69._1080p.m3u8" },
+{ num: 70, url: "https://cdn-aws9.spicychiliti.com/hls/20000/70/70._1080p.m3u8" },
+{ num: 71, url: "https://cdn-aws9.spicychiliti.com/hls/20000/71/71._1080p.m3u8" },
+{ num: 72, url: "https://cdn-aws9.spicychiliti.com/hls/20000/72/72._1080p.m3u8" },
+{ num: 73, url: "https://cdn-aws9.spicychiliti.com/hls/20000/73/73._1080p.m3u8" },
+{ num: 74, url: "https://cdn-aws9.spicychiliti.com/hls/20000/74/74._1080p.m3u8" },
+{ num: 75, url: "https://cdn-aws9.spicychiliti.com/hls/20000/75/75._1080p.m3u8" },
+{ num: 76, url: "https://cdn-aws9.spicychiliti.com/hls/20000/76/76._1080p.m3u8" },
+{ num: 77, url: "https://cdn-aws9.spicychiliti.com/hls/20000/77/77._1080p.m3u8" },
+{ num: 78, url: "https://cdn-aws9.spicychiliti.com/hls/20000/78/78._1080p.m3u8" },
+        { num: 79, url: "https://cdn-aws9.spicychiliti.com/hls/20000/79/79._1080p.m3u8" },
+        { num: 80, url: "https://cdn-aws9.spicychiliti.com/hls/20000/80/80._1080p.m3u8" },
+{ num: 81, url: "https://cdn-aws9.spicychiliti.com/hls/20000/81/81._1080p.m3u8" },
+{ num: 82, url: "https://cdn-aws9.spicychiliti.com/hls/20000/82/82._1080p.m3u8" },
+{ num: 83, url: "https://cdn-aws9.spicychiliti.com/hls/20000/83/83._1080p.m3u8" },
+    ];
+
+    const episodesContainer = document.getElementById("episodes");
+    const video = document.getElementById("video");
+
+    // Create buttons
+    episodes.forEach(ep => {
+        const btn = document.createElement("button");
+        btn.textContent = ep.num;
+        btn.addEventListener("click", () => loadEpisode(ep.url));
+        episodesContainer.appendChild(btn);
+    });
+
+    // Load episode function
+    function loadEpisode(url) {
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            video.src = url;
+        }
+    }
+
+    // Load first episode by default
+    if (episodes.length > 0) {
+        loadEpisode(episodes[0].url);
+    }
+</script>
+
+</body>
+</html>
