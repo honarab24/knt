@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Return Of The True Heir</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: white;
+        text-align: center;
+    }
+    .header {
+        display: flex;
+        align-items: center;
+        background: #1e1e1e;
+        padding: 10px;
+        border-bottom: 2px solid #333;
+    }
+    .header img {
+        height: 50px;
+        margin-right: 10px;
+    }
+    .header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    video {
+        width: 100%;
+        max-height: 500px;
+        background: black;
+    }
+    .episodes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+    .episodes button {
+        padding: 5px;
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 4px;
+        background: #333;
+        color: white;
+        cursor: pointer;
+    }
+    .episodes button:hover {
+        background: #555;
+    }
+</style>
+</head>
+<body>
+
+<!-- Logo + Title -->
+<div class="header">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZKrrqFpYZ-NHa1esZQlKnMNhgOW0t7uceIw&usqp=CAU" alt="Series Logo">
+    <h1>Return Of The True Heir</h1>
+</div>
+
+<!-- Video Player -->
+<video id="video" controls></video>
+
+<!-- Episode Buttons -->
+<div class="episodes" id="episodes"></div>
+
+<script>
+    // List only actual episodes
+    const episodes = [
+        { num: 1, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/1/1.m3u8" },
+        { num: 2, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/2/2.m3u8" },
+{ num: 3, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/3/3.m3u8" },
+{ num: 4, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/4/4.m3u8" },
+{ num: 5, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/5/5.m3u8" },
+{ num: 6, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/6/6.m3u8" },
+{ num: 7, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/7/7.m3u8" },
+{ num: 8, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/8/8.m3u8" },
+{ num: 9, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/9/9.m3u8" },
+{ num: 10, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/10/10.m3u8" },
+{ num: 11, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/11/11.m3u8" },
+{ num: 12, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/12/12.m3u8" },
+{ num: 13, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/13/13.m3u8" },
+{ num: 14, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/14/14.m3u8" },
+{ num: 15, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/15/15.m3u8" },
+{ num: 16, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/16/16.m3u8" },
+{ num: 17, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/17/17.m3u8" },
+{ num: 18, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/18/18.m3u8" },
+{ num: 19, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/19/19.m3u8" },
+{ num: 20, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/20/20.m3u8" },
+{ num: 21, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/21/21.m3u8" },
+{ num: 22, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/22/22.m3u8" },
+{ num: 23, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/23/23.m3u8" },
+{ num: 24, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/24/24.m3u8" },
+{ num: 25, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/25/25.m3u8" },
+{ num: 26, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/26/26.m3u8" },
+        { num: 27, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/27/27.m3u8" },
+        { num: 28, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/28/28.m3u8" },
+{ num: 29, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/29/29.m3u8" },
+{ num: 30, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/30/30.m3u8" },
+{ num: 31, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/31/31.m3u8" },
+{ num: 32, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/32/32.m3u8" },
+{ num: 33, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/33/33.m3u8" },
+{ num: 34, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/34/34.m3u8" },
+{ num: 35, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/35/35.m3u8" },
+{ num: 36, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/36/36.m3u8" },
+{ num: 37, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/37/37.m3u8" },
+{ num: 38, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/38/38.m3u8" },
+{ num: 39, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/39/39.m3u8" },
+{ num: 40, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/40/40.m3u8" },
+{ num: 41, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/41/41.m3u8" },
+{ num: 42, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/42/42.m3u8" },
+{ num: 43, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/43/43.m3u8" },
+{ num: 44, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/44/44.m3u8" },
+{ num: 45, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/45/45.m3u8" },
+{ num: 46, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/46/46.m3u8" },
+{ num: 47, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/47/47.m3u8" },
+{ num: 48, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/48/48.m3u8" },
+{ num: 49, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/49/49.m3u8" },
+{ num: 50, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/50/50.m3u8" },
+{ num: 51, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/51/51.m3u8" },
+{ num: 52, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/52/52.m3u8" },
+        { num: 53, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/53/53.m3u8" },
+        { num: 54, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/54/54.m3u8" },
+{ num: 55, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/55/55.m3u8" },
+{ num: 56, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/56/56.m3u8" },
+{ num: 57, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/57/57.m3u8" },
+{ num: 58, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/58/58.m3u8" },
+{ num: 59, url: "https://cdn-aws9.spicychiliti.com/hls/od/1070/59/59.m3u8" },
+    ];
+
+    const episodesContainer = document.getElementById("episodes");
+    const video = document.getElementById("video");
+
+    // Create buttons
+    episodes.forEach(ep => {
+        const btn = document.createElement("button");
+        btn.textContent = ep.num;
+        btn.addEventListener("click", () => loadEpisode(ep.url));
+        episodesContainer.appendChild(btn);
+    });
+
+    // Load episode function
+    function loadEpisode(url) {
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            video.src = url;
+        }
+    }
+
+    // Load first episode by default
+    if (episodes.length > 0) {
+        loadEpisode(episodes[0].url);
+    }
+</script>
+
+</body>
+</html>
