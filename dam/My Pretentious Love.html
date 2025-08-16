@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Pretentious Love</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: white;
+        text-align: center;
+    }
+    .header {
+        display: flex;
+        align-items: center;
+        background: #1e1e1e;
+        padding: 10px;
+        border-bottom: 2px solid #333;
+    }
+    .header img {
+        height: 50px;
+        margin-right: 10px;
+    }
+    .header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    video {
+        width: 100%;
+        max-height: 500px;
+        background: black;
+    }
+    .episodes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+    .episodes button {
+        padding: 5px;
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 4px;
+        background: #333;
+        color: white;
+        cursor: pointer;
+    }
+    .episodes button:hover {
+        background: #555;
+    }
+</style>
+</head>
+<body>
+
+<!-- Logo + Title -->
+<div class="header">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1UhPG1TReum6ieg5QrVBdGhzsBhembOyZBA&s" alt="Series Logo">
+    <h1>My Pretentious Love</h1>
+</div>
+
+<!-- Video Player -->
+<video id="video" controls></video>
+
+<!-- Episode Buttons -->
+<div class="episodes" id="episodes"></div>
+
+<script>
+    // List only actual episodes
+    const episodes = [
+        { num: 1, url: "https://cdn-aws9.spicychiliti.com/hls/20053/1/1_1080p.m3u8" },
+        { num: 2, url: "https://cdn-aws9.spicychiliti.com/hls/20053/2/2_1080p.m3u8" },
+{ num: 3, url: "https://cdn-aws9.spicychiliti.com/hls/20053/3/3_1080p.m3u8" },
+{ num: 4, url: "https://cdn-aws9.spicychiliti.com/hls/20053/4/4_1080p.m3u8" },
+{ num: 5, url: "https://cdn-aws9.spicychiliti.com/hls/20053/5/5_1080p.m3u8" },
+{ num: 6, url: "https://cdn-aws9.spicychiliti.com/hls/20053/6/6_1080p.m3u8" },
+{ num: 7, url: "https://cdn-aws9.spicychiliti.com/hls/20053/7/7_1080p.m3u8" },
+{ num: 8, url: "https://cdn-aws9.spicychiliti.com/hls/20053/8/8_1080p.m3u8" },
+{ num: 9, url: "https://cdn-aws9.spicychiliti.com/hls/20053/9/9_1080p.m3u8" },
+{ num: 10, url: "https://cdn-aws9.spicychiliti.com/hls/20053/10/10_1080p.m3u8" },
+{ num: 11, url: "https://cdn-aws9.spicychiliti.com/hls/20053/11/11_1080p.m3u8" },
+{ num: 12, url: "https://cdn-aws9.spicychiliti.com/hls/20053/12/12_1080p.m3u8" },
+{ num: 13, url: "https://cdn-aws9.spicychiliti.com/hls/20053/13/13_1080p.m3u8" },
+{ num: 14, url: "https://cdn-aws9.spicychiliti.com/hls/20053/14/14_1080p.m3u8" },
+{ num: 15, url: "https://cdn-aws9.spicychiliti.com/hls/20053/15/15_1080p.m3u8" },
+{ num: 16, url: "https://cdn-aws9.spicychiliti.com/hls/20053/16/16_1080p.m3u8" },
+{ num: 17, url: "https://cdn-aws9.spicychiliti.com/hls/20053/17/17_1080p.m3u8" },
+{ num: 18, url: "https://cdn-aws9.spicychiliti.com/hls/20053/18/18_1080p.m3u8" },
+{ num: 19, url: "https://cdn-aws9.spicychiliti.com/hls/20053/19/19_1080p.m3u8" },
+{ num: 20, url: "https://cdn-aws9.spicychiliti.com/hls/20053/20/20_1080p.m3u8" },
+{ num: 21, url: "https://cdn-aws9.spicychiliti.com/hls/20053/21/21_1080p.m3u8" },
+{ num: 22, url: "https://cdn-aws9.spicychiliti.com/hls/20053/22/22_1080p.m3u8" },
+{ num: 23, url: "https://cdn-aws9.spicychiliti.com/hls/20053/23/23_1080p.m3u8" },
+{ num: 24, url: "https://cdn-aws9.spicychiliti.com/hls/20053/24/24_1080p.m3u8" },
+{ num: 25, url: "https://cdn-aws9.spicychiliti.com/hls/20053/25/25_1080p.m3u8" },
+{ num: 26, url: "https://cdn-aws9.spicychiliti.com/hls/20053/26/26_1080p.m3u8" },
+        { num: 27, url: "https://cdn-aws9.spicychiliti.com/hls/20053/27/27_1080p.m3u8" },
+        { num: 28, url: "https://cdn-aws9.spicychiliti.com/hls/20053/28/28_1080p.m3u8" },
+{ num: 29, url: "https://cdn-aws9.spicychiliti.com/hls/20053/29/29_1080p.m3u8" },
+{ num: 30, url: "https://cdn-aws9.spicychiliti.com/hls/20053/30/30_1080p.m3u8" },
+{ num: 31, url: "https://cdn-aws9.spicychiliti.com/hls/20053/31/31_1080p.m3u8" },
+{ num: 32, url: "https://cdn-aws9.spicychiliti.com/hls/20053/32/32_1080p.m3u8" },
+{ num: 33, url: "https://cdn-aws9.spicychiliti.com/hls/20053/33/33_1080p.m3u8" },
+{ num: 34, url: "https://cdn-aws9.spicychiliti.com/hls/20053/34/34_1080p.m3u8" },
+{ num: 35, url: "https://cdn-aws9.spicychiliti.com/hls/20053/35/35_1080p.m3u8" },
+{ num: 36, url: "https://cdn-aws9.spicychiliti.com/hls/20053/36/36_1080p.m3u8" },
+{ num: 37, url: "https://cdn-aws9.spicychiliti.com/hls/20053/37/37_1080p.m3u8" },
+{ num: 38, url: "https://cdn-aws9.spicychiliti.com/hls/20053/38/38_1080p.m3u8" },
+{ num: 39, url: "https://cdn-aws9.spicychiliti.com/hls/20053/39/39_1080p.m3u8" },
+{ num: 40, url: "https://cdn-aws9.spicychiliti.com/hls/20053/40/40_1080p.m3u8" },
+{ num: 41, url: "https://cdn-aws9.spicychiliti.com/hls/20053/41/41_1080p.m3u8" },
+{ num: 42, url: "https://cdn-aws9.spicychiliti.com/hls/20053/42/42_1080p.m3u8" },
+{ num: 43, url: "https://cdn-aws9.spicychiliti.com/hls/20053/43/43_1080p.m3u8" },
+{ num: 44, url: "https://cdn-aws9.spicychiliti.com/hls/20053/44/44_1080p.m3u8" },
+{ num: 45, url: "https://cdn-aws9.spicychiliti.com/hls/20053/45/45_1080p.m3u8" },
+{ num: 46, url: "https://cdn-aws9.spicychiliti.com/hls/20053/46/46_1080p.m3u8" },
+{ num: 47, url: "https://cdn-aws9.spicychiliti.com/hls/20053/47/47_1080p.m3u8" },
+{ num: 48, url: "https://cdn-aws9.spicychiliti.com/hls/20053/48/48_1080p.m3u8" },
+{ num: 49, url: "https://cdn-aws9.spicychiliti.com/hls/20053/49/49_1080p.m3u8" },
+{ num: 50, url: "https://cdn-aws9.spicychiliti.com/hls/20053/50/50_1080p.m3u8" },
+{ num: 51, url: "https://cdn-aws9.spicychiliti.com/hls/20053/51/51_1080p.m3u8" },
+{ num: 52, url: "https://cdn-aws9.spicychiliti.com/hls/20053/52/52_1080p.m3u8" },
+        { num: 53, url: "https://cdn-aws9.spicychiliti.com/hls/20053/53/53_1080p.m3u8" },
+        { num: 54, url: "https://cdn-aws9.spicychiliti.com/hls/20053/54/54_1080p.m3u8" },
+{ num: 55, url: "https://cdn-aws9.spicychiliti.com/hls/20053/55/55_1080p.m3u8" },
+{ num: 56, url: "https://cdn-aws9.spicychiliti.com/hls/20053/56/56_1080p.m3u8" },
+{ num: 57, url: "https://cdn-aws9.spicychiliti.com/hls/20053/57/57_1080p.m3u8" },
+{ num: 58, url: "https://cdn-aws9.spicychiliti.com/hls/20053/58/58_1080p.m3u8" },
+{ num: 59, url: "https://cdn-aws9.spicychiliti.com/hls/20053/59/59_1080p.m3u8" },
+{ num: 60, url: "https://cdn-aws9.spicychiliti.com/hls/20053/60/60_1080p.m3u8" },
+{ num: 61, url: "https://cdn-aws9.spicychiliti.com/hls/20053/61/61_1080p.m3u8" },
+{ num: 62, url: "https://cdn-aws9.spicychiliti.com/hls/20053/62/62_1080p.m3u8" },
+{ num: 63, url: "https://cdn-aws9.spicychiliti.com/hls/20053/63/63_1080p.m3u8" },
+{ num: 64, url: "https://cdn-aws9.spicychiliti.com/hls/20053/64/64_1080p.m3u8" },
+{ num: 65, url: "https://cdn-aws9.spicychiliti.com/hls/20053/65/65_1080p.m3u8" },
+{ num: 66, url: "https://cdn-aws9.spicychiliti.com/hls/20053/66/66_1080p.m3u8" },
+{ num: 67, url: "https://cdn-aws9.spicychiliti.com/hls/20053/67/67_1080p.m3u8" },
+{ num: 68, url: "https://cdn-aws9.spicychiliti.com/hls/20053/68/68_1080p.m3u8" },
+{ num: 69, url: "https://cdn-aws9.spicychiliti.com/hls/20053/69/69_1080p.m3u8" },
+{ num: 70, url: "https://cdn-aws9.spicychiliti.com/hls/20053/70/70_1080p.m3u8" },
+{ num: 71, url: "https://cdn-aws9.spicychiliti.com/hls/20053/71/71_1080p.m3u8" },
+{ num: 72, url: "https://cdn-aws9.spicychiliti.com/hls/20053/72/72_1080p.m3u8" },
+{ num: 73, url: "https://cdn-aws9.spicychiliti.com/hls/20053/73/73_1080p.m3u8" },
+{ num: 74, url: "https://cdn-aws9.spicychiliti.com/hls/20053/74/74_1080p.m3u8" },
+{ num: 75, url: "https://cdn-aws9.spicychiliti.com/hls/20053/75/75_1080p.m3u8" },
+{ num: 76, url: "https://cdn-aws9.spicychiliti.com/hls/20053/76/76_1080p.m3u8" },
+{ num: 77, url: "https://cdn-aws9.spicychiliti.com/hls/20053/77/77_1080p.m3u8" },
+{ num: 78, url: "https://cdn-aws9.spicychiliti.com/hls/20053/78/78_1080p.m3u8" },
+        { num: 79, url: "https://cdn-aws9.spicychiliti.com/hls/20053/79/79_1080p.m3u8" },
+        { num: 80, url: "https://cdn-aws9.spicychiliti.com/hls/20053/80/80_1080p.m3u8" },
+{ num: 81, url: "https://cdn-aws9.spicychiliti.com/hls/20053/81/81_1080p.m3u8" },
+{ num: 82, url: "https://cdn-aws9.spicychiliti.com/hls/20053/82/82_1080p.m3u8" },
+{ num: 83, url: "https://cdn-aws9.spicychiliti.com/hls/20053/83/83_1080p.m3u8" },
+
+{ num: 84, url: "https://cdn-aws9.spicychiliti.com/hls/20053/84/84_1080p.m3u8" },
+{ num: 85, url: "https://cdn-aws9.spicychiliti.com/hls/20053/85/85_1080p.m3u8" },
+{ num: 86, url: "https://cdn-aws9.spicychiliti.com/hls/20053/86/86_1080p.m3u8" },
+{ num: 87, url: "https://cdn-aws9.spicychiliti.com/hls/20053/87/87_1080p.m3u8" },
+{ num: 88, url: "https://cdn-aws9.spicychiliti.com/hls/20053/88/88_1080p.m3u8" },
+        { num: 89, url: "https://cdn-aws9.spicychiliti.com/hls/20053/89/89_1080p.m3u8" },
+        { num: 90, url: "https://cdn-aws9.spicychiliti.com/hls/20053/90/90_1080p.m3u8" },
+{ num: 91, url: "https://cdn-aws9.spicychiliti.com/hls/20053/91/91_1080p.m3u8" },
+{ num: 92, url: "https://cdn-aws9.spicychiliti.com/hls/20053/92/92_1080p.m3u8" },
+{ num: 93, url: "https://cdn-aws9.spicychiliti.com/hls/20053/93/93_1080p.m3u8" },
+
+{ num: 94, url: "https://cdn-aws9.spicychiliti.com/hls/20053/94/94_1080p.m3u8" },
+{ num: 95, url: "https://cdn-aws9.spicychiliti.com/hls/20053/95/95_1080p.m3u8" },
+{ num: 96, url: "https://cdn-aws9.spicychiliti.com/hls/20053/96/96_1080p.m3u8" },
+{ num: 97, url: "https://cdn-aws9.spicychiliti.com/hls/20053/97/97_1080p.m3u8" },
+    ];
+
+    const episodesContainer = document.getElementById("episodes");
+    const video = document.getElementById("video");
+
+    // Create buttons
+    episodes.forEach(ep => {
+        const btn = document.createElement("button");
+        btn.textContent = ep.num;
+        btn.addEventListener("click", () => loadEpisode(ep.url));
+        episodesContainer.appendChild(btn);
+    });
+
+    // Load episode function
+    function loadEpisode(url) {
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            video.src = url;
+        }
+    }
+
+    // Load first episode by default
+    if (episodes.length > 0) {
+        loadEpisode(episodes[0].url);
+    }
+</script>
+
+</body>
+</html>
