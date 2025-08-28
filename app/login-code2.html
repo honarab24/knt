@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login with Code - TV Remote</title>
+  <title>Login Code 2 - TV Remote</title>
   <style>
     body {
       margin: 0;
@@ -11,47 +11,49 @@
       background-color: #121212;
       color: white;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
     .login-box {
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       text-align: center;
-      margin-bottom: 20px;
+      width: 300px;
     }
 
-    .login-box input {
-      width: 250px;
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #00ffd5;
+    }
+
+    .login-box input, .login-box button {
+      width: 100%;
       padding: 12px;
-      font-size: 20px;
+      margin: 12px 0;
       border-radius: 8px;
       border: none;
-      text-align: center;
-    }
-
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(6, 60px);
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .key {
-      background: #1e1e1e;
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 18px;
-      cursor: pointer;
-      border: 2px solid transparent;
-    }
-
-    .key:focus {
       outline: none;
-      border: 2px solid #00ffd5;
-      background: #333;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .login-box input:focus, .login-box button:focus {
+      outline: 3px solid #00ffd5;
+      background-color: #222;
+    }
+
+    .login-box button {
+      background: #00ffd5;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .login-box button:hover {
+      background: #00c9a7;
     }
 
     .message {
@@ -63,98 +65,102 @@
 </head>
 <body>
   <div class="login-box">
-    <h2>Enter Access Code</h2>
-    <input type="text" id="codeInput" placeholder="----" readonly />
-    <div class="message" id="msg">Use remote arrows + OK to type your code.</div>
-  </div>
-
-  <!-- Virtual keypad -->
-  <div class="keypad" id="keypad">
-    <div class="key" tabindex="0">1</div>
-    <div class="key" tabindex="0">2</div>
-    <div class="key" tabindex="0">3</div>
-    <div class="key" tabindex="0">4</div>
-    <div class="key" tabindex="0">5</div>
-    <div class="key" tabindex="0">6</div>
-    <div class="key" tabindex="0">7</div>
-    <div class="key" tabindex="0">8</div>
-    <div class="key" tabindex="0">9</div>
-    <div class="key" tabindex="0">0</div>
-    <div class="key" tabindex="0">A</div>
-    <div class="key" tabindex="0">B</div>
-    <div class="key" tabindex="0">C</div>
-    <div class="key" tabindex="0">D</div>
-    <div class="key" tabindex="0">E</div>
-    <div class="key" tabindex="0">F</div>
-    <div class="key" tabindex="0">Clear</div>
-    <div class="key" tabindex="0">Enter</div>
+    <h2>Login Code 2</h2>
+    <input type="password" id="codeInput" placeholder="Enter Code" tabindex="1" />
+    <button id="loginBtn" tabindex="2">Login</button>
+    <div class="message" id="msg">Use your TV remote to enter a code.</div>
   </div>
 
   <script>
-    const input = document.getElementById("codeInput");
-    const msg = document.getElementById("msg");
-    const keys = Array.from(document.querySelectorAll(".key"));
-
-    // Example valid codes
+    // ✅ Custom codes: { duration, codeExpire }
     const codes = {
-      "VIP123": 30,  // 30 days
-      "PREMIUM15": 15, // 15 days
-      "WEEKPASS": 7, // 7 days
-      "TRIAL1": 1   // 1 day
+      "VIP123": { duration: 30 * 24 * 60 * 60 * 1000, codeExpire: "2025-12-31" },  // 30 days
+      "PREMIUM15": { duration: 15 * 24 * 60 * 60 * 1000, codeExpire: "2025-11-30" }, // 15 days
+      "WEEKPASS": { duration: 7 * 24 * 60 * 60 * 1000, codeExpire: "2025-09-30" },   // 7 days
+      "TRIAL1": { duration: 1 * 24 * 60 * 60 * 1000, codeExpire: "2025-08-31" }      // 1 day
     };
 
-    // Handle keypad press
-    function pressKey(key) {
-      if (key === "Clear") {
-        input.value = "";
-      } else if (key === "Enter") {
-        login();
-      } else {
-        input.value += key;
-      }
-    }
+    const input = document.getElementById("codeInput");
+    const button = document.getElementById("loginBtn");
+    const msg = document.getElementById("msg");
 
-    // Login check
     function login() {
       const value = input.value.trim();
+
       if (codes[value]) {
-        const expireAt = Date.now() + codes[value] * 24 * 60 * 60 * 1000;
+        const today = new Date();
+        const expireDate = new Date(codes[value].codeExpire);
+
+        if (today > expireDate) {
+          msg.style.color = "red";
+          msg.innerText = "❌ This code has expired.";
+          return;
+        }
+
+        const expireAt = Date.now() + codes[value].duration;
         localStorage.setItem("expireAt", expireAt);
+
         msg.style.color = "lightgreen";
-        msg.innerText = `✅ Access granted (${codes[value]} days)`;
+        msg.innerText = `✅ Access until ${new Date(expireAt).toLocaleString()}`;
 
         setTimeout(() => {
-          window.location.href = "index.html"; // Go to homepage
+          window.location.href = "index.html"; // redirect to home
         }, 1500);
       } else {
         msg.style.color = "red";
-        msg.innerText = "❌ Invalid code.";
+        msg.innerText = "❌ Invalid code, try again.";
       }
     }
 
-    // Allow OK/Enter on remote
-    keys.forEach(key => {
-      key.addEventListener("click", () => pressKey(key.innerText));
-      key.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === "OK") {
-          pressKey(key.innerText);
-        }
-      });
-    });
-
-    // Auto focus first key
-    keys[0].focus();
-
-    // Check expiration
+    // ✅ Auto logout check
     function checkLogin() {
       const expireAt = localStorage.getItem("expireAt");
       if (expireAt && Date.now() > expireAt) {
         localStorage.removeItem("expireAt");
-        alert("⏳ Session expired. Please login again.");
-        window.location.href = "login.html";
+        alert("⏳ Your session expired. Please login again.");
+        window.location.href = "login-code2.html";
       }
     }
     checkLogin();
+
+    // ✅ Remote / keyboard navigation
+    let focusIndex = 0;
+    const focusable = [input, button];
+
+    function updateFocus() {
+      focusable.forEach((el, i) => {
+        if (i === focusIndex) {
+          el.focus();
+        }
+      });
+    }
+    updateFocus();
+
+    document.addEventListener("keydown", (e) => {
+      switch (e.key) {
+        case "ArrowDown":
+        case "ArrowRight":
+          focusIndex = (focusIndex + 1) % focusable.length;
+          updateFocus();
+          e.preventDefault();
+          break;
+        case "ArrowUp":
+        case "ArrowLeft":
+          focusIndex = (focusIndex - 1 + focusable.length) % focusable.length;
+          updateFocus();
+          e.preventDefault();
+          break;
+        case "Enter":
+        case "OK": // for TV remote OK button
+          if (document.activeElement === button) {
+            login();
+          }
+          break;
+      }
+    });
+
+    // Also allow mouse/tap click
+    button.addEventListener("click", login);
   </script>
 </body>
 </html>
