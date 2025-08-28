@@ -76,18 +76,23 @@
       const input = document.getElementById("codeInput").value.trim();
       const msg = document.getElementById("msg");
 
-      // ✅ Change "1234" to your desired login code
-      if (input === "1234") {
-        // Session expires in 24 hours
-        const expireAt = Date.now() + (24 * 60 * 60 * 1000);
+      // ✅ Codes and durations (in milliseconds)
+      const codes = {
+        "30days": 30 * 24 * 60 * 60 * 1000, // 30 days
+        "15days": 15 * 24 * 60 * 60 * 1000, // 15 days
+        "7days": 7 * 24 * 60 * 60 * 1000    // 7 days
+      };
+
+      if (codes[input]) {
+        const expireAt = Date.now() + codes[input];
         localStorage.setItem("expireAt", expireAt);
 
         msg.style.color = "lightgreen";
-        msg.innerText = "✅ Login successful! Redirecting...";
+        msg.innerText = `✅ Login successful! Access granted for ${input.replace("days"," days")}. Redirecting...`;
 
         setTimeout(() => {
           window.location.href = "index.html"; // back to home
-        }, 1200);
+        }, 1500);
       } else {
         msg.style.color = "red";
         msg.innerText = "❌ Invalid code, try again.";
