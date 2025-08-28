@@ -117,54 +117,54 @@
 <body>
   <h1>KONEK TV HOME</h1>
 
-  <button class="login-button" tabindex="1" id="loginBtn" onclick="window.location.href='login-code.html'">
+  <button class="login-button" id="loginBtn" onclick="window.location.href='login-code.html'">
     🔐 Login Code
   </button>
 
   <div id="countdown">🔒 Please login to access channels.</div>
 
   <div class="grid" id="channelGrid">
-    <div class="box" tabindex="2" onclick="openChannel('phchannel')">
+    <div class="box" onclick="openChannel('phchannel')">
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel</span>
     </div>
       
-    <div class="box" tabindex="2" onclick="openChannel('phchannel2')">
+    <div class="box" onclick="openChannel('phchannel2')">
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel (server2)</span>
     </div>
-    <div class="box" tabindex="2" onclick="openChannel('kidsch')">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMJiOHw8pnH7yPiHvaOkHTvt7a4lrWcazF3mMeI6pPvvItUb_g8poCKh4&s=10" alt="PH" />
+    <div class="box" onclick="openChannel('kidsch')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMJiOHw8pnH7yPiHvaOkHTvt7a4lrWcazF3mMeI6pPvvItUb_g8poCKh4&s=10" alt="Kids" />
       <span>Kids Channel</span>
     </div>
-    <div class="box" tabindex="3" onclick="openChannel('astro')">
+    <div class="box" onclick="openChannel('astro')">
       <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
       <span>ASTRO</span>
     </div>
 
-     <div class="box" tabindex="4" onclick="openChannel('movies')">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTphsPHh7IC3_3o5UaJLLWWiJlY8MZDlglnaYlpSpNMNv52k1klo1FcJlA&s=10" alt="Netflix" />
+    <div class="box" onclick="openChannel('movies')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTphsPHh7IC3_3o5UaJLLWWiJlY8MZDlglnaYlpSpNMNv52k1klo1FcJlA&s=10" alt="Movies" />
       <span>Movies Collection</span>
     </div>
     
-    <div class="box" tabindex="4" onclick="openChannel('netflix')">
+    <div class="box" onclick="openChannel('netflix')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
       <span>Netflix (maintenance)</span>
     </div>
-    <div class="box" tabindex="5" onclick="openChannel('primev')">
+    <div class="box" onclick="openChannel('primev')">
       <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
       <span>Prime Video</span>
     </div>
-    <div class="box" tabindex="6" onclick="openChannel('phmovies')">
+    <div class="box" onclick="openChannel('phmovies')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
       <span>PH MOVIES</span>
     </div>
-    <div class="box" tabindex="6" onclick="openChannel('hmtdflix')">
-      <img src="https://i.imgur.com/Q5mztTr.jpeg" alt="" />
+    <div class="box" onclick="openChannel('hmtdflix')">
+      <img src="https://i.imgur.com/Q5mztTr.jpeg" alt="Tagalog" />
       <span>Tagalog Dubbed Movies</span>
     </div>
-        <div class="box" tabindex="6" onclick="openChannel('radioph')">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2t8R4JouinFJJeQp1GpvRQM1lHp6JNP4HUClYItIbDYWxYZytj_68Vz8w&s=10" alt="" />
+    <div class="box" onclick="openChannel('radioph')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2t8R4JouinFJJeQp1GpvRQM1lHp6JNP4HUClYItIbDYWxYZytj_68Vz8w&s=10" alt="Radio" />
       <span>Radio PH</span>
     </div>
   </div>
@@ -217,22 +217,30 @@
       }, 1000);
     }
 
+    // ✅ Improved TV Remote & Keyboard navigation
     document.addEventListener('keydown', function (e) {
       const focusable = Array.from(document.querySelectorAll('.login-button, .box'))
         .filter(el => getComputedStyle(el).display !== 'none');
 
-      const currentIndex = focusable.indexOf(document.activeElement);
-      const cols = Math.floor(window.innerWidth / 180);
+      let currentIndex = focusable.indexOf(document.activeElement);
+      if (currentIndex === -1) currentIndex = 0;
+
+      const cols = Math.max(1, Math.floor(window.innerWidth / 180));
 
       if (e.key === 'ArrowRight') {
-        focusable[currentIndex + 1]?.focus();
+        e.preventDefault();
+        focusable[(currentIndex + 1) % focusable.length]?.focus();
       } else if (e.key === 'ArrowLeft') {
-        focusable[currentIndex - 1]?.focus();
+        e.preventDefault();
+        focusable[(currentIndex - 1 + focusable.length) % focusable.length]?.focus();
       } else if (e.key === 'ArrowDown') {
-        if (currentIndex >= 0) focusable[currentIndex + cols]?.focus();
+        e.preventDefault();
+        focusable[currentIndex + cols]?.focus();
       } else if (e.key === 'ArrowUp') {
-        if (currentIndex >= 0) focusable[currentIndex - cols]?.focus();
+        e.preventDefault();
+        focusable[currentIndex - cols]?.focus();
       } else if (e.key === 'Enter') {
+        e.preventDefault();
         document.activeElement?.click();
       }
     });
