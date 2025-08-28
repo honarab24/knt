@@ -41,6 +41,16 @@
       text-align: center;
     }
 
+    /* ✅ Code text color */
+    .login-box input {
+      color: #00ffd5;
+      background-color: #181818;
+    }
+
+    .login-box input::placeholder {
+      color: #888;
+    }
+
     .login-box input:focus, .login-box button:focus {
       outline: 3px solid #00ffd5;
       background-color: #222;
@@ -56,6 +66,16 @@
       background: #00c9a7;
     }
 
+    .toggle-btn {
+      background: #444;
+      color: white;
+      font-size: 14px;
+    }
+
+    .toggle-btn:hover {
+      background: #666;
+    }
+
     .message {
       margin-top: 15px;
       font-size: 14px;
@@ -67,22 +87,31 @@
   <div class="login-box">
     <h2>Login Code 2</h2>
     <input type="password" id="codeInput" placeholder="Enter Code" tabindex="1" />
-    <button id="loginBtn" tabindex="2">Login</button>
+    <button id="toggleCodeBtn" class="toggle-btn" tabindex="2">👁 Show Code</button>
+    <button id="loginBtn" tabindex="3">Login</button>
     <div class="message" id="msg">Use your TV remote to enter a code.</div>
   </div>
 
   <script>
-    // ✅ Custom codes: { duration, codeExpire }
     const codes = {
-      "VIP123": { duration: 30 * 24 * 60 * 60 * 1000, codeExpire: "2025-12-31" },  // 30 days
-      "PREMIUM15": { duration: 15 * 24 * 60 * 60 * 1000, codeExpire: "2025-11-30" }, // 15 days
-      "WEEKPASS": { duration: 7 * 24 * 60 * 60 * 1000, codeExpire: "2025-09-30" },   // 7 days
-      "TRIAL1": { duration: 1 * 24 * 60 * 60 * 1000, codeExpire: "2025-08-31" }      // 1 day
+      "VIP123": { duration: 30 * 24 * 60 * 60 * 1000, codeExpire: "2025-12-31" },
+      "PREMIUM15": { duration: 15 * 24 * 60 * 60 * 1000, codeExpire: "2025-11-30" },
+      "WEEKPASS": { duration: 7 * 24 * 60 * 60 * 1000, codeExpire: "2025-09-30" },
+      "TRIAL1": { duration: 1 * 24 * 60 * 60 * 1000, codeExpire: "2025-08-31" }
     };
 
     const input = document.getElementById("codeInput");
+    const toggleBtn = document.getElementById("toggleCodeBtn");
     const button = document.getElementById("loginBtn");
     const msg = document.getElementById("msg");
+
+    let showCode = false;
+
+    function toggleCode() {
+      showCode = !showCode;
+      input.type = showCode ? "text" : "password";
+      toggleBtn.innerText = showCode ? "🙈 Hide Code" : "👁 Show Code";
+    }
 
     function login() {
       const value = input.value.trim();
@@ -104,7 +133,7 @@
         msg.innerText = `✅ Access until ${new Date(expireAt).toLocaleString()}`;
 
         setTimeout(() => {
-          window.location.href = "index.html"; // redirect to home
+          window.location.href = "index.html";
         }, 1500);
       } else {
         msg.style.color = "red";
@@ -112,7 +141,6 @@
       }
     }
 
-    // ✅ Auto logout check
     function checkLogin() {
       const expireAt = localStorage.getItem("expireAt");
       if (expireAt && Date.now() > expireAt) {
@@ -123,9 +151,8 @@
     }
     checkLogin();
 
-    // ✅ Remote / keyboard navigation
     let focusIndex = 0;
-    const focusable = [input, button];
+    const focusable = [input, toggleBtn, button];
 
     function updateFocus() {
       focusable.forEach((el, i) => {
@@ -151,15 +178,17 @@
           e.preventDefault();
           break;
         case "Enter":
-        case "OK": // for TV remote OK button
+        case "OK":
           if (document.activeElement === button) {
             login();
+          } else if (document.activeElement === toggleBtn) {
+            toggleCode();
           }
           break;
       }
     });
 
-    // Also allow mouse/tap click
+    toggleBtn.addEventListener("click", toggleCode);
     button.addEventListener("click", login);
   </script>
 </body>
