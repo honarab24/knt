@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Code 2</title>
+  <title>Login with Code - TV Remote</title>
   <style>
     body {
       margin: 0;
@@ -11,49 +11,47 @@
       background-color: #121212;
       color: white;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
     .login-box {
-      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       text-align: center;
-      width: 300px;
-    }
-
-    .login-box h2 {
       margin-bottom: 20px;
-      color: #00ffd5;
     }
 
     .login-box input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      width: 250px;
+      padding: 12px;
+      font-size: 20px;
       border-radius: 8px;
       border: none;
-      outline: none;
-      font-size: 16px;
       text-align: center;
     }
 
-    .login-box button {
-      background: #00ffd5;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 15px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(6, 60px);
+      gap: 10px;
+      justify-content: center;
     }
 
-    .login-box button:hover {
-      background: #00c9a7;
+    .key {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 18px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .key:focus {
+      outline: none;
+      border: 2px solid #00ffd5;
+      background: #333;
     }
 
     .message {
@@ -65,63 +63,97 @@
 </head>
 <body>
   <div class="login-box">
-    <h2>Login Code 2</h2>
-    <input type="password" id="codeInput" placeholder="Enter Code" />
-    <button onclick="login()">Login</button>
-    <div class="message" id="msg">Enter your code to unlock access.</div>
+    <h2>Enter Access Code</h2>
+    <input type="text" id="codeInput" placeholder="----" readonly />
+    <div class="message" id="msg">Use remote arrows + OK to type your code.</div>
+  </div>
+
+  <!-- Virtual keypad -->
+  <div class="keypad" id="keypad">
+    <div class="key" tabindex="0">1</div>
+    <div class="key" tabindex="0">2</div>
+    <div class="key" tabindex="0">3</div>
+    <div class="key" tabindex="0">4</div>
+    <div class="key" tabindex="0">5</div>
+    <div class="key" tabindex="0">6</div>
+    <div class="key" tabindex="0">7</div>
+    <div class="key" tabindex="0">8</div>
+    <div class="key" tabindex="0">9</div>
+    <div class="key" tabindex="0">0</div>
+    <div class="key" tabindex="0">A</div>
+    <div class="key" tabindex="0">B</div>
+    <div class="key" tabindex="0">C</div>
+    <div class="key" tabindex="0">D</div>
+    <div class="key" tabindex="0">E</div>
+    <div class="key" tabindex="0">F</div>
+    <div class="key" tabindex="0">Clear</div>
+    <div class="key" tabindex="0">Enter</div>
   </div>
 
   <script>
-    // ✅ Custom codes: { duration, codeExpire }
+    const input = document.getElementById("codeInput");
+    const msg = document.getElementById("msg");
+    const keys = Array.from(document.querySelectorAll(".key"));
+
+    // Example valid codes
     const codes = {
-      "VIP123": { duration: 30 * 24 * 60 * 60 * 1000, codeExpire: "2025-12-31" },  // 30 days
-      "PREMIUM15": { duration: 15 * 24 * 60 * 60 * 1000, codeExpire: "2025-11-30" }, // 15 days
-      "WEEKPASS": { duration: 7 * 24 * 60 * 60 * 1000, codeExpire: "2025-09-30" },   // 7 days
-      "TRIAL1": { duration: 1 * 24 * 60 * 60 * 1000, codeExpire: "2025-08-31" }      // 1 day
+      "VIP123": 30,  // 30 days
+      "PREMIUM15": 15, // 15 days
+      "WEEKPASS": 7, // 7 days
+      "TRIAL1": 1   // 1 day
     };
 
-    function login() {
-      const input = document.getElementById("codeInput").value.trim();
-      const msg = document.getElementById("msg");
-
-      if (codes[input]) {
-        const today = new Date();
-        const expireDate = new Date(codes[input].codeExpire);
-
-        // Check if code is still valid
-        if (today > expireDate) {
-          msg.style.color = "red";
-          msg.innerText = "❌ This code has expired.";
-          return;
-        }
-
-        // Set access duration
-        const expireAt = Date.now() + codes[input].duration;
-        localStorage.setItem("expireAt", expireAt);
-
-        msg.style.color = "lightgreen";
-        msg.innerText = `✅ Login successful! Access granted until ${new Date(expireAt).toLocaleString()}. Redirecting...`;
-
-        setTimeout(() => {
-          window.location.href = "index.html"; // Redirect to home
-        }, 1500);
+    // Handle keypad press
+    function pressKey(key) {
+      if (key === "Clear") {
+        input.value = "";
+      } else if (key === "Enter") {
+        login();
       } else {
-        msg.style.color = "red";
-        msg.innerText = "❌ Invalid code, try again.";
+        input.value += key;
       }
     }
 
-    // ✅ Auto logout if expired
+    // Login check
+    function login() {
+      const value = input.value.trim();
+      if (codes[value]) {
+        const expireAt = Date.now() + codes[value] * 24 * 60 * 60 * 1000;
+        localStorage.setItem("expireAt", expireAt);
+        msg.style.color = "lightgreen";
+        msg.innerText = `✅ Access granted (${codes[value]} days)`;
+
+        setTimeout(() => {
+          window.location.href = "index.html"; // Go to homepage
+        }, 1500);
+      } else {
+        msg.style.color = "red";
+        msg.innerText = "❌ Invalid code.";
+      }
+    }
+
+    // Allow OK/Enter on remote
+    keys.forEach(key => {
+      key.addEventListener("click", () => pressKey(key.innerText));
+      key.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === "OK") {
+          pressKey(key.innerText);
+        }
+      });
+    });
+
+    // Auto focus first key
+    keys[0].focus();
+
+    // Check expiration
     function checkLogin() {
       const expireAt = localStorage.getItem("expireAt");
       if (expireAt && Date.now() > expireAt) {
         localStorage.removeItem("expireAt");
-        alert("⏳ Your session has expired. Please login again.");
-        window.location.href = "login-code2.html"; // back to login
+        alert("⏳ Session expired. Please login again.");
+        window.location.href = "login.html";
       }
     }
-
-    // Run check every time page loads
     checkLogin();
   </script>
 </body>
