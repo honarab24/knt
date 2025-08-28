@@ -69,10 +69,10 @@
       display: block;
     }
 
+    /* Login buttons */
     .login-button {
       position: absolute;
       top: 10px;
-      right: 10px;
       z-index: 999;
       background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
       border-radius: 12px;
@@ -92,6 +92,14 @@
       border: 2px solid #00ffd5;
       background-color: #00ffd5;
       color: black;
+    }
+
+    #loginBtn {
+      right: 10px; /* top-right */
+    }
+
+    #loginBtn2 {
+      left: 10px; /* top-left */
     }
 
     @media (max-width: 600px) {
@@ -119,8 +127,13 @@
 <body>
   <h1>KONEK TV HOME</h1>
 
+  <!-- 🔐 Two Login buttons -->
   <button class="login-button" id="loginBtn" onclick="window.location.href='login-code.html'">
     🔐 Login Code
+  </button>
+
+  <button class="login-button" id="loginBtn2" onclick="window.location.href='login-code2.html'">
+    🔐 Login Code2
   </button>
 
   <div id="countdown">🔒 Please login to access channels.</div>
@@ -187,10 +200,12 @@
       if (expireAt && now < parseInt(expireAt)) {
         isLoggedIn = true;
         document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("loginBtn2").style.display = "none";
         updateCountdown(parseInt(expireAt));
       } else {
         isLoggedIn = false;
         document.getElementById("loginBtn").style.display = "inline-block";
+        document.getElementById("loginBtn2").style.display = "inline-block";
         document.getElementById("countdown").innerText = "🔒 Please login to access channels.";
         cancelAnimationFrame(countdownReq);
       }
@@ -208,6 +223,7 @@
           isLoggedIn = false;
           countdownEl.innerText = "🔒 Session expired. Please login again.";
           document.getElementById("loginBtn").style.display = "inline-block";
+          document.getElementById("loginBtn2").style.display = "inline-block";
           return;
         }
 
@@ -223,7 +239,7 @@
       tick();
     }
 
-    // ✅ Optimized navigation (cache elements once)
+    // ✅ Remote/keyboard navigation
     let focusable;
     function cacheFocusable() {
       focusable = Array.from(document.querySelectorAll('.login-button, .box'))
