@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>KONEK TV HOME</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ffd5;
+      padding: 20px 0 10px;
+      font-size: 24px;
+    }
+
+    #countdown {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 0 20px 40px;
+    }
+
+    .box {
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      border-radius: 15px;
+      text-align: center;
+      padding: 20px;
+      transition: transform 0.2s ease, border 0.2s ease;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .box:focus {
+      border: 3px solid #00ffd5;
+      transform: scale(1.05);
+    }
+
+    .box:hover {
+      background-color: #00ffd5;
+      color: black;
+    }
+
+    .box img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+    }
+
+    .box span {
+      font-size: 16px;
+      font-weight: bold;
+      display: block;
+    }
+
+    .login-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      border-radius: 12px;
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      border: 2px solid transparent;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
+    }
+
+    .login-button:hover,
+    .login-button:focus {
+      border: 2px solid #00ffd5;
+      background-color: #00ffd5;
+      color: black;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .box img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .box {
+        padding: 15px;
+      }
+
+      .login-button {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>KONEK TV HOME</h1>
+
+  <button class="login-button" id="loginBtn" onclick="window.location.href='login-code.html'">
+    🔐 Login Code
+  </button>
+
+  <div id="countdown">🔒 Please login to access channels.</div>
+
+  <div class="grid" id="channelGrid">
+    <div class="box" onclick="openChannel('phchannel')">
+      <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
+      <span>Philippines Channel</span>
+    </div>
+    <div class="box" onclick="openChannel('phchannel2')">
+      <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
+      <span>Philippines Channel (server2)</span>
+    </div>
+    <div class="box" onclick="openChannel('kidsch')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMJiOHw8pnH7yPiHvaOkHTvt7a4lrWcazF3mMeI6pPvvItUb_g8poCKh4&s=10" alt="Kids" />
+      <span>Kids Channel</span>
+    </div>
+    <div class="box" onclick="openChannel('astro')">
+      <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
+      <span>ASTRO</span>
+    </div>
+    <div class="box" onclick="openChannel('movies')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTphsPHh7IC3_3o5UaJLLWWiJlY8MZDlglnaYlpSpNMNv52k1klo1FcJlA&s=10" alt="Movies" />
+      <span>Movies Collection</span>
+    </div>
+    <div class="box" onclick="openChannel('netflix')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
+      <span>Netflix (maintenance)</span>
+    </div>
+    <div class="box" onclick="openChannel('primev')">
+      <img src="https://img.icons8.com/color/96/amazon-prime-video.png" alt="Prime Video" />
+      <span>Prime Video</span>
+    </div>
+    <div class="box" onclick="openChannel('phmovies')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVrgX31Jsk0Dh9j0j5QtMCPMYbvnGRLLb692Puv9BKXmK05BRd8i0ORvk&s=10" alt="PH MOVIES" />
+      <span>PH MOVIES</span>
+    </div>
+    <div class="box" onclick="openChannel('hmtdflix')">
+      <img src="https://i.imgur.com/Q5mztTr.jpeg" alt="Tagalog" />
+      <span>Tagalog Dubbed Movies</span>
+    </div>
+    <div class="box" onclick="openChannel('radioph')">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2t8R4JouinFJJeQp1GpvRQM1lHp6JNP4HUClYItIbDYWxYZytj_68Vz8w&s=10" alt="Radio" />
+      <span>Radio PH</span>
+    </div>
+  </div>
+
+  <script>
+    let isLoggedIn = false;
+    let countdownReq;
+
+    function openChannel(id) {
+      if (isLoggedIn) {
+        window.location.href = "go:" + id;
+      } else {
+        alert("🔒 Please login to access this channel.");
+      }
+    }
+
+    function checkLogin() {
+      const expireAt = localStorage.getItem('expireAt');
+      const now = Date.now();
+
+      if (expireAt && now < parseInt(expireAt)) {
+        isLoggedIn = true;
+        document.getElementById("loginBtn").style.display = "none";
+        updateCountdown(parseInt(expireAt));
+      } else {
+        isLoggedIn = false;
+        document.getElementById("loginBtn").style.display = "inline-block";
+        document.getElementById("countdown").innerText = "🔒 Please login to access channels.";
+        cancelAnimationFrame(countdownReq);
+      }
+    }
+
+    function updateCountdown(expireAt) {
+      const countdownEl = document.getElementById("countdown");
+
+      function tick() {
+        const now = Date.now();
+        const diff = expireAt - now;
+
+        if (diff <= 0) {
+          localStorage.removeItem("expireAt");
+          isLoggedIn = false;
+          countdownEl.innerText = "🔒 Session expired. Please login again.";
+          document.getElementById("loginBtn").style.display = "inline-block";
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        countdownEl.innerText = `🔓 Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        countdownReq = requestAnimationFrame(tick);
+      }
+
+      tick();
+    }
+
+    // ✅ Optimized navigation (cache elements once)
+    let focusable;
+    function cacheFocusable() {
+      focusable = Array.from(document.querySelectorAll('.login-button, .box'))
+        .filter(el => getComputedStyle(el).display !== 'none');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (!focusable || focusable.length === 0) cacheFocusable();
+
+      let currentIndex = focusable.indexOf(document.activeElement);
+      if (currentIndex === -1) currentIndex = 0;
+
+      const cols = Math.max(1, Math.floor(window.innerWidth / 180));
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        focusable[(currentIndex + 1) % focusable.length]?.focus();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        focusable[(currentIndex - 1 + focusable.length) % focusable.length]?.focus();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        focusable[currentIndex + cols]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        focusable[currentIndex - cols]?.focus();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        document.activeElement?.click();
+      }
+    });
+
+    window.onload = () => {
+      checkLogin();
+      cacheFocusable();
+      const first = document.querySelector('.login-button, .box');
+      if (first) first.focus();
+    };
+  </script>
+</body>
+</html>
