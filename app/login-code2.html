@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Code 2</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      text-align: center;
+      width: 300px;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #00ffd5;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .login-box button {
+      background: #00ffd5;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .login-box button:hover {
+      background: #00c9a7;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login Code 2</h2>
+    <input type="password" id="codeInput" placeholder="Enter Code" />
+    <button onclick="login()">Login</button>
+    <div class="message" id="msg">Enter your code to unlock access.</div>
+  </div>
+
+  <script>
+    // ✅ Custom codes: { duration, codeExpire }
+    const codes = {
+      "VIP123": { duration: 30 * 24 * 60 * 60 * 1000, codeExpire: "2025-12-31" },  // 30 days
+      "PREMIUM15": { duration: 15 * 24 * 60 * 60 * 1000, codeExpire: "2025-11-30" }, // 15 days
+      "WEEKPASS": { duration: 7 * 24 * 60 * 60 * 1000, codeExpire: "2025-09-30" },   // 7 days
+      "TRIAL1": { duration: 1 * 24 * 60 * 60 * 1000, codeExpire: "2025-08-31" }      // 1 day
+    };
+
+    function login() {
+      const input = document.getElementById("codeInput").value.trim();
+      const msg = document.getElementById("msg");
+
+      if (codes[input]) {
+        const today = new Date();
+        const expireDate = new Date(codes[input].codeExpire);
+
+        // Check if code is still valid
+        if (today > expireDate) {
+          msg.style.color = "red";
+          msg.innerText = "❌ This code has expired.";
+          return;
+        }
+
+        // Set access duration
+        const expireAt = Date.now() + codes[input].duration;
+        localStorage.setItem("expireAt", expireAt);
+
+        msg.style.color = "lightgreen";
+        msg.innerText = `✅ Login successful! Access granted until ${new Date(expireAt).toLocaleString()}. Redirecting...`;
+
+        setTimeout(() => {
+          window.location.href = "index.html"; // Redirect to home
+        }, 1500);
+      } else {
+        msg.style.color = "red";
+        msg.innerText = "❌ Invalid code, try again.";
+      }
+    }
+
+    // ✅ Auto logout if expired
+    function checkLogin() {
+      const expireAt = localStorage.getItem("expireAt");
+      if (expireAt && Date.now() > expireAt) {
+        localStorage.removeItem("expireAt");
+        alert("⏳ Your session has expired. Please login again.");
+        window.location.href = "login-code2.html"; // back to login
+      }
+    }
+
+    // Run check every time page loads
+    checkLogin();
+  </script>
+</body>
+</html>
