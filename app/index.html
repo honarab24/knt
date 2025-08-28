@@ -40,10 +40,11 @@
       border-radius: 15px;
       text-align: center;
       padding: 20px;
-      transition: 0.3s ease;
+      transition: transform 0.2s ease, border 0.2s ease;
       outline: none;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       cursor: pointer;
+      will-change: transform;
     }
 
     .box:focus {
@@ -83,6 +84,7 @@
       text-align: center;
       cursor: pointer;
       outline: none;
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
     }
 
     .login-button:hover,
@@ -128,7 +130,6 @@
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel</span>
     </div>
-      
     <div class="box" onclick="openChannel('phchannel2')">
       <img src="https://img.icons8.com/color/96/philippines.png" alt="PH" />
       <span>Philippines Channel (server2)</span>
@@ -141,12 +142,10 @@
       <img src="https://images.seeklogo.com/logo-png/40/2/astro-2012-logo-png_seeklogo-400104.png" alt="Astro" />
       <span>ASTRO</span>
     </div>
-
     <div class="box" onclick="openChannel('movies')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTphsPHh7IC3_3o5UaJLLWWiJlY8MZDlglnaYlpSpNMNv52k1klo1FcJlA&s=10" alt="Movies" />
       <span>Movies Collection</span>
     </div>
-    
     <div class="box" onclick="openChannel('netflix')">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQASk7mM9LwCqE8CxSxqt7XYZboUM_x3OrwjQ&usqp=CAU" alt="Netflix" />
       <span>Netflix (maintenance)</span>
@@ -171,6 +170,7 @@
 
   <script>
     let isLoggedIn = false;
+    let countdownReq;
 
     function openChannel(id) {
       if (isLoggedIn) {
@@ -192,19 +192,22 @@
         isLoggedIn = false;
         document.getElementById("loginBtn").style.display = "inline-block";
         document.getElementById("countdown").innerText = "🔒 Please login to access channels.";
+        cancelAnimationFrame(countdownReq);
       }
     }
 
     function updateCountdown(expireAt) {
       const countdownEl = document.getElementById("countdown");
-      const interval = setInterval(() => {
+
+      function tick() {
         const now = Date.now();
         const diff = expireAt - now;
 
         if (diff <= 0) {
-          clearInterval(interval);
           localStorage.removeItem("expireAt");
-          location.reload();
+          isLoggedIn = false;
+          countdownEl.innerText = "🔒 Session expired. Please login again.";
+          document.getElementById("loginBtn").style.display = "inline-block";
           return;
         }
 
@@ -214,13 +217,21 @@
         const seconds = Math.floor((diff / 1000) % 60);
 
         countdownEl.innerText = `🔓 Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }, 1000);
+        countdownReq = requestAnimationFrame(tick);
+      }
+
+      tick();
     }
 
-    // ✅ Improved TV Remote & Keyboard navigation
-    document.addEventListener('keydown', function (e) {
-      const focusable = Array.from(document.querySelectorAll('.login-button, .box'))
+    // ✅ Optimized navigation (cache elements once)
+    let focusable;
+    function cacheFocusable() {
+      focusable = Array.from(document.querySelectorAll('.login-button, .box'))
         .filter(el => getComputedStyle(el).display !== 'none');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (!focusable || focusable.length === 0) cacheFocusable();
 
       let currentIndex = focusable.indexOf(document.activeElement);
       if (currentIndex === -1) currentIndex = 0;
@@ -247,6 +258,7 @@
 
     window.onload = () => {
       checkLogin();
+      cacheFocusable();
       const first = document.querySelector('.login-button, .box');
       if (first) first.focus();
     };
