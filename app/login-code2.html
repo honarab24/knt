@@ -22,7 +22,7 @@
       border-radius: 15px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       text-align: center;
-      width: 300px;
+      width: 320px;
     }
 
     .login-box h2 {
@@ -76,11 +76,12 @@
       const input = document.getElementById("codeInput").value.trim();
       const msg = document.getElementById("msg");
 
-      // ✅ Codes and durations (in milliseconds)
+      // ✅ Custom codes with their access duration
       const codes = {
-        "30days": 30 * 24 * 60 * 60 * 1000, // 30 days
-        "15days": 15 * 24 * 60 * 60 * 1000, // 15 days
-        "7days": 7 * 24 * 60 * 60 * 1000    // 7 days
+        "VIP30": 30 * 24 * 60 * 60 * 1000,  // 30 days
+        "PREMIUM15": 15 * 24 * 60 * 60 * 1000, // 15 days
+        "FREE7": 7 * 24 * 60 * 60 * 1000,   // 7 days
+        "TRIAL1": 1 * 24 * 60 * 60 * 1000   // 1 day
       };
 
       if (codes[input]) {
@@ -88,7 +89,7 @@
         localStorage.setItem("expireAt", expireAt);
 
         msg.style.color = "lightgreen";
-        msg.innerText = `✅ Login successful! Access granted for ${input.replace("days"," days")}. Redirecting...`;
+        msg.innerText = `✅ Login successful! Access granted for ${codes[input] / (1000*60*60*24)} days. Redirecting...`;
 
         setTimeout(() => {
           window.location.href = "index.html"; // back to home
