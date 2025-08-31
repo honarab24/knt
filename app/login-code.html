@@ -112,8 +112,8 @@
         const duration = data.duration;
         const createdAt = data.createdAt?.toDate?.() || new Date();
 
-        // ✅ Accept 1, 7, 15, 30 days
-        if (![1, 7, 15, 30].includes(duration)) {
+        // ✅ Accept 1, 7, 15, 30, 60 days
+        if (![1, 7, 15, 30, 60].includes(duration)) {
           showMessage("⚠️ Code has an invalid duration.", "#ffcc00");
           return;
         }
