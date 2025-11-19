@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Login Code</title>
+
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #00ffd5;
+      margin-bottom: 20px;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 14px;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 20px;
+      width: 280px;
+      text-align: center;
+      background: #1f1f1f;
+      color: white;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border: 2px solid #00ffd5;
+      box-shadow: 0 0 12px #00ffd5;
+    }
+
+    button {
+      padding: 14px 28px;
+      background: #00ffd5;
+      color: black;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover, button:focus {
+      background: #00c0a8;
+      outline: none;
+      box-shadow: 0 0 12px #00ffd5;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* Shake on error */
+    .shake {
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Enter Login Code</h2>
+
+  <input type="text" id="codeInput" maxlength="20" placeholder="Enter code" tabindex="0" autofocus />
+  <button id="submitBtn" tabindex="1">Submit</button>
+
+  <div id="message"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFGKEug6X8UxVqhQaa4fSv14ZhPOX87IE",
+      authDomain: "konektv-login.firebaseapp.com",
+      projectId: "konektv-login",
+      storageBucket: "konektv-login.firebasestorage.app",
+      messagingSenderId: "289819667898",
+      appId: "1:289819667898:web:4b95994fc6a27c84f78183"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const input = document.getElementById("codeInput");
+    const messageEl = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(text, color) {
+      messageEl.textContent = text;
+      messageEl.style.color = color;
+
+      // Add shake effect on error
+      messageEl.classList.add("shake");
+      setTimeout(() => messageEl.classList.remove("shake"), 300);
+    }
+
+    async function validateCode() {
+      const code = input.value.trim();
+
+      if (!code || code.length < 4) {
+        showMessage("⚠️ Enter a valid code (min 4 characters)", "#ff6666");
+        return;
+      }
+
+      try {
+        const ref = doc(db, "codes", code);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          showMessage("❌ Invalid code.", "#ff6666");
+          return;
+        }
+
+        const data = snap.data();
+        const duration = Number(data.duration);
+        const createdAt = data.createdAt?.toDate?.() || new Date();
+
+        // Automatically accept 1–360 days
+        if (duration < 1 || duration > 360) {
+          showMessage("⚠️ Invalid duration in code.", "#ffcc00");
+          return;
+        }
+
+        const expireAt = new Date(createdAt.getTime() + duration * 86400000);
+        const now = new Date();
+
+        if (now > expireAt) {
+          showMessage("⏰ Code has expired.", "#ff6666");
+          return;
+        }
+
+        // Save session
+        localStorage.setItem("expireAt", expireAt.getTime());
+        localStorage.setItem("loginCode", code);
+
+        window.location.href = "index.html";
+
+      } catch (err) {
+        console.error(err);
+        showMessage("❌ Error connecting to server.", "#ff4444");
+      }
+    }
+
+    // ENTER key support
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") validateCode();
+    });
+
+    submitBtn.addEventListener("click", validateCode);
+
+    // TV Remote Support
+    let focused = 0;
+    const elements = [input, submitBtn];
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        focused = Math.min(focused + 1, elements.length - 1);
+        elements[focused].focus();
+      }
+      if (e.key === "ArrowUp") {
+        focused = Math.max(focused - 1, 0);
+        elements[focused].focus();
+      }
+    });
+  </script>
+</body>
+</html>
