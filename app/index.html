@@ -63,6 +63,7 @@
     color: #ccc;
   }
 
+  /* GRID */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -86,8 +87,12 @@
     color: black;
   }
 
+  /* FIXED: Remote focus highlight */
   .box:focus {
-    border: 3px solid #00ffd5;
+    outline: none;
+    border: 3px solid #00aaff;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #00aaff;
     transform: scale(1.05);
   }
 
@@ -141,13 +146,6 @@
     .box { padding: 15px; }
     .btn { font-size: 12px; padding: 8px 12px; }
   }
-  
-.channel:focus {
-    outline: none;
-    border: 3px solid #00aaff;
-    border-radius: 12px;
-    box-shadow: 0 0 15px #00aaff
-}
 </style>
 </head>
 
@@ -168,7 +166,6 @@
 <!-- CHANNEL GRID -->
 <div class="grid" id="channelGrid">
 
-  <!-- Your channels (unchanged) -->
   <div class="box" onclick="openChannel('phchannel')">
     <img src="https://img.icons8.com/color/96/philippines.png"><span>Philippines Channel</span>
   </div>
@@ -289,59 +286,54 @@ window.onload = () => {
   checkLogin();
 };
 </script>
+
+<!-- FIXED REMOTE NAVIGATION -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const items = Array.from(document.querySelectorAll(".channel"));
+    const items = Array.from(document.querySelectorAll(".box"));
     let index = 0;
 
-    // Auto focus first channel
-    if (items.length > 0) {
-        items[0].focus();
+    if (items.length > 0) items[0].focus();
+
+    function getCols() {
+        const grid = document.querySelector(".grid");
+        const itemWidth = items[0].offsetWidth;
+        const gridWidth = grid.clientWidth;
+        return Math.floor(gridWidth / itemWidth);
     }
 
     document.addEventListener("keydown", (e) => {
-        const cols = 3; // <-- SET number of columns in your grid
+        const cols = getCols();
 
         switch (e.key) {
-
             case "ArrowRight":
-                if (index < items.length - 1) {
-                    index++;
-                    items[index].focus();
-                }
+                if (index < items.length - 1) index++;
+                items[index].focus();
                 break;
 
             case "ArrowLeft":
-                if (index > 0) {
-                    index--;
-                    items[index].focus();
-                }
+                if (index > 0) index--;
+                items[index].focus();
                 break;
 
             case "ArrowDown":
-                if (index + cols < items.length) {
-                    index += cols;
-                    items[index].focus();
-                }
+                if (index + cols < items.length) index += cols;
+                items[index].focus();
                 break;
 
             case "ArrowUp":
-                if (index - cols >= 0) {
-                    index -= cols;
-                    items[index].focus();
-                }
+                if (index - cols >= 0) index -= cols;
+                items[index].focus();
                 break;
 
             case "Enter":
             case "OK":
-                items[index].click(); // Trigger the channel
-                break;
-
-            default:
+                items[index].click();
                 break;
         }
     });
 });
-                      </script>
+</script>
+
 </body>
 </html>
