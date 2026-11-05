@@ -1,0 +1,509 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KONEK TV HOME</title><style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: white;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ANNOUNCEMENT */
+.announcement {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(90deg,#00ffd5,#0066ff,#ff00ff);
+    background-size: 300% 300%;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 14px;
+    overflow: hidden;
+    z-index: 1000;
+    animation: bgShift 6s linear infinite;
+    box-shadow: 0 2px 10px rgba(0,0,0,.5);
+}
+
+.announcement span {
+    display: inline-block;
+    animation: scrollText 20s linear infinite;
+    text-shadow: 0 0 10px #00ffd5,0 0 20px #00ffd5;
+    white-space: nowrap;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes scrollText {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+h1 {
+    text-align: center;
+    color: #00ffd5;
+    padding: 65px 0 10px;
+    font-size: 26px;
+}
+
+#countdown {
+    text-align: center;
+    font-size: 16px;
+    margin: 10px 10px 20px;
+    color: #ccc;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+    gap: 20px;
+    padding: 0 20px 40px;
+}
+
+.box {
+    background: linear-gradient(145deg,#1e1e1e,#2c2c2c);
+    border-radius: 15px;
+    text-align: center;
+    padding: 20px;
+    transition: transform .2s ease,border .2s ease;
+    outline: none;
+    border: 3px solid transparent;
+    box-shadow: 0 4px 12px rgba(0,0,0,.5);
+    cursor: pointer;
+}
+
+.box:focus {
+    border: 3px solid #00ffd5;
+    transform: scale(1.05);
+}
+
+.box:hover {
+    background: #00ffd5;
+    color: black;
+}
+
+.box img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+    object-fit: contain;
+}
+
+.box span {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+}
+
+/* BUTTONS */
+.btn {
+    background: linear-gradient(145deg,#1e1e1e,#2c2c2c);
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+}
+
+.btn:hover,
+.btn:focus {
+    border: 2px solid #00ffd5;
+    background: #00ffd5;
+    color: black;
+}
+
+#contactBtn {
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    z-index: 999;
+}
+
+#loginBtn {
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    z-index: 999;
+}
+
+#login2Btn {
+    position: absolute;
+    top: 75px;
+    right: 10px;
+    z-index: 999;
+}
+
+@media(max-width:600px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+        gap: 15px;
+    }
+
+    .box img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .box {
+        padding: 15px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+</style></head><body><!-- ANNOUNCEMENT --><div class="announcement">
+<span>📢 ANNOUNCEMENT: Welcome to KONEK TV! Enjoy free channels, NBA Live, and more! Stay tuned for updates 🔥</span>
+</div><!-- BUTTONS --><button class="btn" id="contactBtn"
+onclick="window.open('https://www.facebook.com/s2s.Isabela','_blank')">
+📞 Contact
+</button>
+
+<button class="btn" id="loginBtn"
+onclick="window.location.href='login-code.html'">
+🔐 Login Code 1
+</button>
+
+<button class="btn" id="login2Btn"
+onclick="window.location.href='login-code2.html'">
+🔐 Login Code 2
+</button>
+
+<h1>KONEK TV HOME</h1><div id="countdown">
+🔒 Please login to access channels.
+</div><!-- CHANNEL GRID --><div class="grid" id="channelGrid"><div class="box" onclick="openChannel('phchannel')">
+<img src="https://img.icons8.com/color/96/philippines.png" alt="PH">
+<span>Philippines Channel</span>
+</div><div class="box" onclick="openChannel('kidsch')">
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMJiOHw8pnH7yPiHvaOkHTvt7a4lrWcazF3mMeI6pPvvItUb_g8poCKh4&s=10" alt="Kids">
+<span>Kids Channel</span>
+</div><div class="box" onclick="openChannel('premovies')">
+<img src="https://i.imgur.com/fnKRRVm.png" alt="Premium movies">
+<span>Premium Movies Channel</span>
+</div><div class="box" onclick="openChannel('pbbevent')">
+<img src="https://aphrodite.gmanetwork.com/entertainment/videos/images/1200_675_ALL-ACCESS-YT_-20251030153730.jpg" alt="PBB">
+<span>PBB ALL ACCESS</span>
+</div><div class="box" onclick="openChannel('pilipilive')">
+<img src="https://pilipinaslive.com/assets/images/logo/pilipinaslive-logo-wbg.png" alt="Pilipinas">
+<span>Pilipinas Live</span>
+</div><div class="box" onclick="openChannel('masports')">
+<img src="https://i.imgur.com/VizFGD5.png" alt="Sports">
+<span>Sports Event</span>
+</div><div class="box" onclick="openChannel('mmk')">
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyLKpFG_GdqWlCzebATrSfHzCShkKpZK7HNTW7lI-mzAnrChIT1qGKshD4&s=10" alt="Movies">
+<span>MMK</span>
+</div><div class="box" onclick="openChannel('hmtdflix')">
+<img src="https://i.imgur.com/gU243nJ.png" alt="Movies">
+<span>Tagalog Dubbed Movies</span>
+</div><div class="box" onclick="openChannel('gmvlog')">
+<img src="https://i.imgur.com/CEmMORF.png" alt="Drama">
+<span>Drama Series Tagalog Dubbed</span>
+</div><div class="box" onclick="openChannel('animetg')">
+<img src="https://i.imgur.com/CxW3UZP.png" alt="Anime">
+<span>Anime Tagalog Dubbed</span>
+</div><div class="box" onclick="openChannel('radioph')">
+<img src="https://i.imgur.com/K6Wh7Mb.png" alt="Radio">
+<span>Radio PH</span>
+</div><div class="box" onclick="openChannel('maflix')">
+<img src="https://i.imgur.com/cdSX74I.png" alt="MAFLIX">
+<span>MAFLIX</span>
+</div><div class="box" onclick="openChannel('kisskh')">
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSm59-5b0_ctrgsLvtmbnw6ChKk8xSkH-Ho7Q&s" alt="KissKH">
+<span>KISS KH</span>
+</div><div class="box" onclick="openChannel('karaoke')">
+<img src="https://i.imgur.com/KExBJlq.png" alt="Karaoke">
+<span>KARAOKE</span>
+</div></div><script>
+
+/* ALL LOGIN SESSION STORAGE KEYS */
+const SESSION_KEYS = [
+    "expireAt",
+    "login2ExpireAt",
+    "login3ExpireAt",
+    "login4ExpireAt"
+];
+
+let isLoggedIn = false;
+let countdownTimer = null;
+
+/* GET ALL VALID SESSIONS */
+function getValidSessions() {
+
+    const now = Date.now();
+    const sessions = [];
+
+    SESSION_KEYS.forEach(key => {
+
+        const expiration = Number(localStorage.getItem(key)) || 0;
+
+        if (expiration > now) {
+            sessions.push({
+                key: key,
+                expiration: expiration
+            });
+        } else if (expiration > 0) {
+
+            // Remove only the expired session
+            localStorage.removeItem(key);
+
+            const usernameKey = key + "Username";
+            localStorage.removeItem(usernameKey);
+
+            // Existing Login Code 1 cleanup
+            if (key === "expireAt") {
+                localStorage.removeItem("loginCode");
+            }
+        }
+    });
+
+    return sessions;
+}
+
+/* CHECK ACCESS */
+function checkLogin() {
+
+    const sessions = getValidSessions();
+
+    isLoggedIn = sessions.length > 0;
+
+    const validLogin1 = sessions.some(
+        session => session.key === "expireAt"
+    );
+
+    const validLogin2 = sessions.some(
+        session => [
+            "login2ExpireAt",
+            "login3ExpireAt",
+            "login4ExpireAt"
+        ].includes(session.key)
+    );
+
+    // Show or hide login buttons
+    document.getElementById("loginBtn").style.display =
+        validLogin1 ? "none" : "inline-block";
+
+    document.getElementById("login2Btn").style.display =
+        validLogin2 ? "none" : "inline-block";
+
+    cacheFocusable();
+
+    if (isLoggedIn) {
+
+        const longestExpiry = Math.max(
+            ...sessions.map(session => session.expiration)
+        );
+
+        startCountdown(longestExpiry);
+
+    } else {
+
+        document.getElementById("countdown").innerText =
+            "🔒 Please login to access channels.";
+
+        stopCountdown();
+    }
+}
+
+/* COUNTDOWN */
+function startCountdown() {
+
+    stopCountdown();
+
+    function tick() {
+
+        const sessions = getValidSessions();
+        isLoggedIn = sessions.length > 0;
+
+        if (!isLoggedIn) {
+
+            document.getElementById("countdown").innerText =
+                "🔒 Session expired. Please login again.";
+
+            stopCountdown();
+
+            checkLogin();
+            return;
+        }
+
+        const now = Date.now();
+
+        const latestExpiry = Math.max(
+            ...sessions.map(session => session.expiration)
+        );
+
+        const diff = latestExpiry - now;
+
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff / 3600000) % 24);
+        const minutes = Math.floor((diff / 60000) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        document.getElementById("countdown").innerText =
+            `🔓 Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+        updateLoginButtons(sessions);
+
+        countdownTimer = setTimeout(tick, 1000);
+    }
+
+    tick();
+}
+
+/* UPDATE LOGIN BUTTONS */
+function updateLoginButtons(sessions) {
+
+    const validLogin1 = sessions.some(
+        session => session.key === "expireAt"
+    );
+
+    const validLogin2 = sessions.some(
+        session => [
+            "login2ExpireAt",
+            "login3ExpireAt",
+            "login4ExpireAt"
+        ].includes(session.key)
+    );
+
+    document.getElementById("loginBtn").style.display =
+        validLogin1 ? "none" : "inline-block";
+
+    document.getElementById("login2Btn").style.display =
+        validLogin2 ? "none" : "inline-block";
+
+    cacheFocusable();
+}
+
+/* STOP COUNTDOWN */
+function stopCountdown() {
+
+    if (countdownTimer !== null) {
+        clearTimeout(countdownTimer);
+        countdownTimer = null;
+    }
+}
+
+/* OPEN CHANNEL */
+function openChannel(id) {
+
+    checkCurrentAccess();
+
+    if (isLoggedIn) {
+        window.location.href = "go:" + id;
+    } else {
+        alert("🔒 Please login to access this channel.");
+    }
+}
+
+/* CHECK CURRENT ACCESS BEFORE OPENING CHANNEL */
+function checkCurrentAccess() {
+
+    const sessions = getValidSessions();
+
+    isLoggedIn = sessions.length > 0;
+}
+
+/* TV REMOTE NAVIGATION */
+let focusable = [];
+
+function cacheFocusable() {
+
+    focusable = Array.from(
+        document.querySelectorAll(".btn, .box")
+    ).filter(el => {
+        return getComputedStyle(el).display !== "none";
+    });
+}
+
+document.addEventListener("keydown", function(e) {
+
+    cacheFocusable();
+
+    if (!focusable.length) return;
+
+    let currentIndex = focusable.indexOf(document.activeElement);
+
+    if (currentIndex === -1) currentIndex = 0;
+
+    const cols = Math.max(
+        1,
+        Math.floor(window.innerWidth / 180)
+    );
+
+    if (e.key === "ArrowRight") {
+
+        e.preventDefault();
+        focusable[(currentIndex + 1) % focusable.length]?.focus();
+
+    } else if (e.key === "ArrowLeft") {
+
+        e.preventDefault();
+        focusable[
+            (currentIndex - 1 + focusable.length) % focusable.length
+        ]?.focus();
+
+    } else if (e.key === "ArrowDown") {
+
+        e.preventDefault();
+        focusable[currentIndex + cols]?.focus();
+
+    } else if (e.key === "ArrowUp") {
+
+        e.preventDefault();
+        focusable[currentIndex - cols]?.focus();
+
+    } else if (e.key === "Enter") {
+
+        e.preventDefault();
+        document.activeElement?.click();
+    }
+});
+
+/* REFRESH ACCESS WHEN RETURNING TO PAGE */
+document.addEventListener("visibilitychange", function() {
+
+    if (!document.hidden) {
+        checkLogin();
+    }
+});
+
+window.addEventListener("storage", function(event) {
+
+    if (SESSION_KEYS.includes(event.key)) {
+        checkLogin();
+    }
+});
+
+/* START */
+window.onload = function() {
+
+    checkLogin();
+
+    cacheFocusable();
+
+    const first = document.querySelector(".btn, .box");
+
+    if (first) first.focus();
+};
+
+</script></body>
+</html>
